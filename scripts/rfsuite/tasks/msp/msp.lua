@@ -31,8 +31,7 @@ msp.onConnectChecksInit = true
 
 local protocol = assert(loadfile("tasks/msp/protocols.lua"))()
 
-msp.sensor = sport.getSensor({primId = 0x32})
-msp.sensorTlm = sport.getSensor()
+
 msp.mspQueue = mspQueue
 
 -- set active protocol to use
@@ -55,6 +54,9 @@ msp.mspHelper = assert(loadfile("tasks/msp/mspHelper.lua"))()
 msp.api = assert(loadfile("tasks/msp/api.lua"))()
 msp.common = assert(loadfile("tasks/msp/common.lua"))()
 
+local delayDuration = 2  -- seconds
+local delayStartTime = nil
+local delayPending = false
 
 function msp.resetState()
     rfsuite.session.servoOverride = nil
@@ -68,6 +70,36 @@ function msp.resetState()
 end
 
 function msp.wakeup()
+
+    if rfsuite.session.telemetrySensor == nil then return end
+
+    if not msp.sensor then
+        msp.sensor = sport.getSensor({primId = 0x32})
+        msp.sensor:module(rfsuite.session.telemetrySensor:module())
+    end
+    
+    if not msp.sensorTlm then
+        msp.sensorTlm = sport.getSensor()
+        msp.sensorTlm:module(rfsuite.session.telemetrySensor:module())
+    end
+
+    if rfsuite.session.resetMSP and not delayPending then
+        delayStartTime = os.clock()
+        delayPending = true
+        rfsuite.session.resetMSP = false  -- Reset immediately
+        rfsuite.utils.log("Delaying msp wakeup for " .. delayDuration .. " seconds","info")
+        return  -- Exit early; wait starts now
+    end
+
+    if delayPending then
+        if os.clock() - delayStartTime >= delayDuration then
+            rfsuite.utils.log("Delay complete; resuming msp wakeup","info")
+            delayPending = false
+        else
+            rfsuite.tasks.msp.mspQueue:clear()
+            return  -- Still waiting; do nothing
+        end
+    end
 
    msp.activeProtocol = rfsuite.session.telemetryType
 

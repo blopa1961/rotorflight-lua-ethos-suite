@@ -28,6 +28,11 @@ local modelTextPos = {x = 0, y = rfsuite.app.radio.linePaddingTop, w = rfsuite.s
 
 local function getESCDetails()
 
+    if rfsuite.session.escDetails ~= nil then
+        escDetails = rfsuite.session.escDetails
+        foundESC = true 
+        return
+    end
 
     if foundESC == true then 
         return
@@ -42,21 +47,26 @@ local function getESCDetails()
                 mspBytesCheck = mspBytes
             end
  
-            if #buf >= mspBytesCheck and buf[1] == mspSignature then
-
+            --if #buf >= mspBytesCheck and buf[1] == mspSignature then
+            if buf[1] == mspSignature then
                 escDetails.model = ESC.getEscModel(buf)
                 escDetails.version = ESC.getEscVersion(buf)
                 escDetails.firmware = ESC.getEscFirmware(buf)
+
+                rfsuite.session.escDetails = escDetails
 
                 if ESC.mspBufferCache == true then
                     rfsuite.session.escBuffer = buf 
                 end    
 
-                foundESC = true
+                if escDetails.model ~= nil  then
+                    foundESC = true
+                end
 
             end
 
         end,
+        uuid = "123e4567-e89b-12d3-b456-426614174201",
         simulatorResponse = simulatorResponse
     }
 
@@ -70,6 +80,7 @@ local function openPage(pidx, title, script)
     rfsuite.app.lastScript = script
 
     rfsuite.session.escBuffer = nil -- clear the buffer
+    
 
     local folder = title
 
@@ -182,53 +193,63 @@ local function openPage(pidx, title, script)
     if rfsuite.app.gfx_buttons["esctool"] == nil then rfsuite.app.gfx_buttons["esctool"] = {} end
     if rfsuite.app.menuLastSelected["esctool"] == nil then rfsuite.app.menuLastSelected["esctool"] = 1 end
 
-    for pidx, pvalue in ipairs(ESC.pages) do
+    for pidx, pvalue in ipairs(ESC.pages) do 
 
-        if lc == 0 then
-            if rfsuite.preferences.iconSize == 0 then y = form.height() + rfsuite.app.radio.buttonPaddingSmall end
-            if rfsuite.preferences.iconSize == 1 then y = form.height() + rfsuite.app.radio.buttonPaddingSmall end
-            if rfsuite.preferences.iconSize == 2 then y = form.height() + rfsuite.app.radio.buttonPadding end
-        end
 
-        if lc >= 0 then bx = (buttonW + padding) * lc end
+        local section = pvalue
+        local hideSection = (section.ethosversion and rfsuite.session.ethosRunningVersion < section.ethosversion) or
+                            (section.mspversion and (rfsuite.session.apiVersion or 1) < section.mspversion) 
+                            --or
+                            --(section.developer and not rfsuite.config.developerMode)
 
-        if rfsuite.preferences.iconSize ~= 0 then
-            if rfsuite.app.gfx_buttons["esctool"][pvalue.image] == nil then rfsuite.app.gfx_buttons["esctool"][pvalue.image] = lcd.loadMask("app/modules/esc_tools/mfg/" .. folder .. "/gfx/" .. pvalue.image) end
-        else
-            rfsuite.app.gfx_buttons["esctool"][pvalue.image] = nil
-        end
+        if not pvalue.disablebutton or (pvalue and pvalue.disablebutton(mspBytes) == false) or not hideSection then
 
-        rfsuite.app.formFields[pidx] = form.addButton(nil, {x = bx, y = y, w = buttonW, h = buttonH}, {
-            text = pvalue.title,
-            icon = rfsuite.app.gfx_buttons["esctool"][pvalue.image],
-            options = FONT_S,
-            paint = function()
-            end,
-            press = function()
-                rfsuite.app.menuLastSelected["esctool"] = pidx
-                rfsuite.app.ui.progressDisplay()
-
-                rfsuite.app.ui.openPage(pidx, title, "esc_tools/mfg/" .. folder .. "/pages/" .. pvalue.script)
-
+            if lc == 0 then
+                if rfsuite.preferences.iconSize == 0 then y = form.height() + rfsuite.app.radio.buttonPaddingSmall end
+                if rfsuite.preferences.iconSize == 1 then y = form.height() + rfsuite.app.radio.buttonPaddingSmall end
+                if rfsuite.preferences.iconSize == 2 then y = form.height() + rfsuite.app.radio.buttonPadding end
             end
-        })
 
-        if rfsuite.app.menuLastSelected["esctool"] == pidx then rfsuite.app.formFields[pidx]:focus() end
+            if lc >= 0 then bx = (buttonW + padding) * lc end
 
-        if rfsuite.app.triggers.escToolEnableButtons == true then
-            rfsuite.app.formFields[pidx]:enable(true)
-        else
-            rfsuite.app.formFields[pidx]:enable(false)
+            if rfsuite.preferences.iconSize ~= 0 then
+                if rfsuite.app.gfx_buttons["esctool"][pvalue.image] == nil then rfsuite.app.gfx_buttons["esctool"][pvalue.image] = lcd.loadMask("app/modules/esc_tools/mfg/" .. folder .. "/gfx/" .. pvalue.image) end
+            else
+                rfsuite.app.gfx_buttons["esctool"][pvalue.image] = nil
+            end
+
+            rfsuite.app.formFields[pidx] = form.addButton(nil, {x = bx, y = y, w = buttonW, h = buttonH}, {
+                text = pvalue.title,
+                icon = rfsuite.app.gfx_buttons["esctool"][pvalue.image],
+                options = FONT_S,
+                paint = function()
+                end,
+                press = function()
+                    rfsuite.app.menuLastSelected["esctool"] = pidx
+                    rfsuite.app.ui.progressDisplay()
+
+                    rfsuite.app.ui.openPage(pidx, title, "esc_tools/mfg/" .. folder .. "/pages/" .. pvalue.script)
+
+                end
+            })
+
+            if rfsuite.app.menuLastSelected["esctool"] == pidx then rfsuite.app.formFields[pidx]:focus() end
+
+            if rfsuite.app.triggers.escToolEnableButtons == true then
+                rfsuite.app.formFields[pidx]:enable(true)
+            else
+                rfsuite.app.formFields[pidx]:enable(false)
+            end
+
+            lc = lc + 1
+
+            if lc == numPerRow then lc = 0 end
         end
-
-        lc = lc + 1
-
-        if lc == numPerRow then lc = 0 end
 
     end
 
     rfsuite.app.triggers.escToolEnableButtons = false
-    getESCDetails()
+    --getESCDetails()
     collectgarbage()
 end
 

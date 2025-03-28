@@ -22,7 +22,7 @@
 local apiLoader = {}
 
 -- Define the API directory path based on the ethos version
-local apidir = "tasks/msp/api/"
+local apidir = "SCRIPTS:/".. rfsuite.config.baseDir  .. "/tasks/msp/api/"
 local api_path = apidir
 
 -- New version using the global callback system
@@ -33,6 +33,7 @@ function apiLoader.scheduleWakeup(func)
         rfsuite.utils.log("ERROR: rfsuite.tasks.callbackNow() is missing!", "error")
     end
 end
+
 
 --[[
     Loads a Lua API module by its name, checks for the existence of the file, and wraps its functions.
@@ -291,7 +292,7 @@ function apiLoader.parseMSPData(buf, structure, processed, other, options)
                 state.index - processedFields, state.index - 1), "debug")
 
             if state.index > #structure then
-                if completionCallback then
+                if completionCallback and buf.offset then
                     completionCallback({
                         parsed = state.parsedData,
                         buffer = buf,
@@ -300,6 +301,17 @@ function apiLoader.parseMSPData(buf, structure, processed, other, options)
                         processed = state.processed,
                         other = state.other,
                         receivedBytesCount = math.floor(buf.offset - 1)
+                    })
+                else
+                    rfsuite.utils.log("Completion callback not provided or buffer offset not available", "info")
+                    completionCallback({
+                        parsed = {state.parsedData},
+                        buffer = {},
+                        structure = structure,
+                        positionmap = state.positionmap,
+                        processed = state.processed,
+                        other = state.other,
+                        receivedBytesCount = 0
                     })
                 end
             else
@@ -601,7 +613,9 @@ function apiLoader.buildDeltaPayload(apiname, payload, api_structure, positionma
     local actual_fields = {}
     if rfsuite.app.Page and rfsuite.app.Page.mspapi then
         for _, field in ipairs(rfsuite.app.Page.mspapi.formdata.fields) do
-            actual_fields[field.apikey] = field
+            if actual_fields[field.apikey] then -- we check this because its possible a field may not be there is mspgt or msplt is used on page.
+                actual_fields[field.apikey] = field
+            end
         end
     end 
 
