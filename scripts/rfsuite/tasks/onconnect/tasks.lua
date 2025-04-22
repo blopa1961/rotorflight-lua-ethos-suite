@@ -62,6 +62,11 @@ function tasks.resetAllTasks()
         task.resetPending = false
         task.startTime = nil
     end
+
+    -- reset all main tasks
+    rfsuite.tasks.reset()
+    rfsuite.session.resetMSPSensors = true
+
     completionNotified = false
 end
 

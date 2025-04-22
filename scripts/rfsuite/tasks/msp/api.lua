@@ -605,7 +605,8 @@ function apiLoader.buildDeltaPayload(apiname, payload, api_structure, positionma
     for idx, formField in ipairs(rfsuite.app.formFields) do
         local pageField = rfsuite.app.Page.fields[idx]
         if pageField and pageField.apikey then
-            editableFields[pageField.apikey] = true
+            local key = pageField.apikey:match("([^%-]+)%-%>") or pageField.apikey
+            editableFields[key] = true
         end
     end
 
@@ -618,6 +619,7 @@ function apiLoader.buildDeltaPayload(apiname, payload, api_structure, positionma
             end
         end
     end 
+
 
     -- Iterate over the API structure and apply updates
     for _, field_def in ipairs(api_structure) do
@@ -722,11 +724,17 @@ function apiLoader.buildFullPayload(apiname, payload, api_structure)
             field_def.step = field_def.step or actual_field.step
             field_def.min = field_def.min or actual_field.min
             field_def.max = field_def.max or actual_field.max
+            field_def.decimals = field_def.decimals or actual_field.decimals
         end
 
         -- Process value with scale
         local value = payload[field_name] or field_def.default or 0
         local scale = field_def.scale or 1
+        
+        -- scale is an odd one and needs to be handled differently
+        if not actual_field and field_def.decimals then
+            scale = scale / rfsuite.app.utils.decimalInc(field_def.decimals)
+        end
         value = math.floor(value * scale + 0.5)
 
         -- Determine write function
