@@ -18,94 +18,136 @@
  * 
 
 ]] --
+rfsuite = {}
+rfsuite.session = {}
+
+-- initialise legacy font if not already set (ethos 1.6 vs 1.7)
+if not FONT_M then FONT_M = FONT_STD end
+
+
 -- RotorFlight + ETHOS LUA configuration
 local config = {}
 
 -- Configuration settings for the Rotorflight Lua Ethos Suite
-config.toolName = "Rotorflight"                                         -- name of the tool 
-config.icon = lcd.loadMask("app/gfx/icon.png")                          -- icon
+config.toolName = "Rotorflight"                                                     -- name of the tool 
+config.icon = lcd.loadMask("app/gfx/icon.png")                                      -- icon
 config.icon_logtool = lcd.loadMask("app/gfx/icon_logtool.png")          -- icon
-config.icon_unsupported = lcd.loadMask("app/gfx/unsupported.png")       -- icon
-config.version = {major = 2, minor = 2, revision = 0, suffix = "RC4"}   -- version of the script
-config.ethosVersion = {1, 6, 2}                                         -- min version of ethos supported by this script                                                     
-config.supportedMspApiVersion = {"12.06", "12.07","12.08"}              -- supported msp versions
-config.simulatorApiVersionResponse = {0, 12, 8}                         -- version of api return by simulator
-config.baseDir = "rfsuite"                                              -- base directory for the suite. This is only used by msp api to ensure correct path
-config.logLevel= "info"                                                 -- off | info | debug [default = info]
-config.logToFile = false                                                -- log to file [default = false] (log file is in /scripts/rfsuite/logs)
-config.logMSP = false                                                   -- log msp messages [default =  false]
-config.logMSPQueue = false                                              -- log msp queue size [default = false]
-config.logMemoryUsage = false                                           -- log memory usage [default = false]
-config.developerMode = false                                            -- show developer tools on main menu [default = false]
-config.compile = true                                                   -- use the compiler [default = true]
-config.compilerTiming = false                                           -- log compiler timings [default = false]
+config.icon_unsupported = lcd.loadMask("app/gfx/unsupported.png")                   -- icon
+config.version = {major = 2, minor = 3, revision = 0, suffix = "DEV"}               -- version of the script
+config.ethosVersion = {1, 6, 2}                                                      -- min version of ethos supported by this script                                                     
+config.supportedMspApiVersion = {"12.07","12.08","12.09"}                          -- supported msp versions
+config.baseDir = "rfsuite"                                                          -- base directory for the suite. This is only used by msp api to ensure correct path
+config.preferences = config.baseDir .. ".user"                                      -- user preferences folder location
+config.defaultRateProfile = 4 -- ACTUAL                                             -- default rate table [default = 4]
+config.watchdogParam = 10                                                           -- watchdog timeout for progress boxes [default = 10]
 
--- RotorFlight + ETHOS LUA preferences
-local preferences = {}
+rfsuite.config = config
 
--- Configuration options that adjust behavior of the script (will be moved to a settings menu in the future)
-preferences.flightLog = true                                        -- will write a flight log into /scripts/rfsuite/logs/<modelname>/*.log
-preferences.reloadOnSave = false                                    -- trigger a reload on save [default = false]
-preferences.internalElrsSensors = true                              -- disable the integrated elrs telemetry processing [default = true]
-preferences.internalSportSensors = true                             -- disable the integrated smart port telemetry processing [default = true]
-preferences.internalSimSensors = true                               -- disable the integrated simulator telemetry processing [default = true]
-preferences.adjFunctionAlerts = false                               -- do not alert on adjfunction telemetry.  [default = false]
-preferences.adjValueAlerts = true                                   -- play adjvalue alerts if sensor changes [default = true]  
-preferences.saveWhenArmedWarning = true                             -- do not display the save when armed warning. [default = true]
-preferences.audioAlerts = 1                                         -- 0 = all, 1 = alerts, 2 = disable [default = 1]
-preferences.profileSwitching = true                                 -- enable auto profile switching [default = true]
-preferences.iconSize = 1                                            -- 0 = text, 1 = small, 2 = large [default = 1]
-preferences.syncCraftName = false                                   -- sync the craft name with the model name [default = false]
-preferences.mspExpBytes = 8                                         -- number of bytes for msp_exp [default = 8] 
-preferences.defaultRateProfile = 4 -- ACTUAL                        -- default rate table [default = 4]
-preferences.watchdogParam = 10                                      -- watchdog timeout for progress boxes [default = 10]
-preferences.spreadScheduling = true                                 -- false = all tasks run on all cycles.  true = tasks are spread over multiple cycles. [default = true]
+--[[
+    Loads and updates user preferences from an INI file.
 
+    Steps:
+    1. Retrieves the user preferences file path from the configuration.
+    2. Sets `slave_ini` to the default user preferences.
+    3. Initializes `master_ini` as an empty table.
+    4. If the user preferences file exists, loads its contents into `master_ini`.
+    5. Merges `master_ini` (existing preferences) with `slave_ini` (defaults) to ensure all default values are present.
+    6. Assigns the merged preferences to `rfsuite.preferences`.
+    7. If the loaded preferences differ from the defaults, saves the updated preferences back to the file and logs the update.
+
+    This ensures that any missing default preferences are added to the user's preferences file without overwriting existing values.
+]]
+rfsuite.ini = assert(loadfile("lib/ini.lua"))(config) -- self contantained and never compiled
+
+-- set defaults for user preferences
+local userpref_defaults ={
+    general ={
+        iconsize = 2,
+        syncname = false,
+        gimbalsupression = 0.85
+    },
+    localizations = {
+        temperature_unit = 0, -- 0 = Celsius, 1 = Fahrenheit
+        altitude_unit = 0, -- 0 = meters, 1 = feet
+    },
+    dashboard = {
+        theme_preflight = "system/default",
+        theme_inflight = "system/default",
+        theme_postflight = "system/default",
+    },
+    events = {
+        armflags            = true,
+        voltage             = true,
+        governor            = true,
+        pid_profile         = true,
+        rate_profile        = true,
+        esc_temp            = false,
+        escalertvalue       = 90,
+        bec_voltage         = false,
+        becalertvalue       = 6.5,
+        smartfuel           = true,
+        smartfuelcallout    = 0,
+        smartfuelrepeats    = 1,
+        smartfuelhaptic     = false,
+    },
+    switches = {
+    },
+    developer = {
+        compile = true,             -- compile the script
+        devtools = false,           -- show dev tools menu
+        logtofile = false,          -- log to file
+        loglevel = "off",           -- off, info, debug
+        logmsp = false,             -- print msp byte stream to log  
+        logmspQueue = false,        -- periodic print the msp queue size
+        memstats = false,           -- perioid print memory usage 
+        mspexpbytes = 8,
+        apiversion = 2,             -- msp api version to use for simulator    
+    },
+    timer = {
+        timeraudioenable=false,
+        elapsedalertmode=0,
+        prealerton=false,
+        postalerton=false,
+        prealertinterval=10,
+        prealertperiod=30,
+        postalertinterval=10,
+        postalertperiod=30,
+    },
+    menulastselected = {}
+}
+
+os.mkdir("SCRIPTS:/" .. rfsuite.config.preferences)
+local userpref_file = "SCRIPTS:/" .. rfsuite.config.preferences .. "/preferences.ini"
+local slave_ini = userpref_defaults
+local master_ini = rfsuite.ini.load_ini_file(userpref_file) or {}
+
+local updated_ini = rfsuite.ini.merge_ini_tables(master_ini, slave_ini)
+rfsuite.preferences = updated_ini
+
+if not rfsuite.ini.ini_tables_equal(master_ini, slave_ini) then
+    rfsuite.ini.save_ini_file(userpref_file, updated_ini)
+end 
 
 -- tasks
-config.bgTaskName = config.toolName .. " [Background]"              -- background task name for msp services etc
-config.bgTaskKey = "rf2bg"                                          -- key id used for msp services
-
-
---- Checks if the `developerMode` is disabled in the `config` table.
---- If disabled, attempts to enable it by checking for the existence of a 
---- file named `../developermode`. If the file exists, it sets 
---- `config.developerMode` to `true`.
----
---- Note:
---- - The file path `../developermode` is relative to the script's execution directory.
---- - This functionality is likely used to toggle developer-specific features 
----   during runtime.
-if not config.developerMode then
-    local f = io.open("../developermode", "r")
-    if f then
-        io.close(f)
-        config.developerMode = true
-    end
-end
-
+rfsuite.config.bgTaskName = rfsuite.config.toolName .. " [Background]"              -- background task name for msp services etc
+rfsuite.config.bgTaskKey = "rf2bg"                                          -- key id used for msp services
 
 -- main
 -- rfsuite: Main table for the rotorflight-lua-ethos-suite script.
 -- rfsuite.config: Configuration table for the suite.
 -- rfsuite.session: Session table for the suite.
 -- rfsuite.app: Application module loaded from "app/app.lua" with the provided configuration.
-rfsuite = {}
-rfsuite.config = config
-rfsuite.preferences = preferences
-rfsuite.session = {}
-rfsuite.compiler = assert(loadfile("lib/compile.lua"))(config) 
-rfsuite.app = assert(rfsuite.compiler.loadfile("app/app.lua"))(config)
-
-
-
--- library with utility functions used throughou the suite
-rfsuite.utils = assert(rfsuite.compiler.loadfile("lib/utils.lua"))(config)
-
+rfsuite.compiler = assert(loadfile("lib/compile.lua"))(rfsuite.config) 
 
 -- Load the i18n system
-rfsuite.i18n  = assert(rfsuite.compiler.loadfile("lib/i18n.lua"))(config)
+rfsuite.i18n  = assert(rfsuite.compiler.loadfile("lib/i18n.lua"))(rfsuite.config)
 rfsuite.i18n.load()     
+
+-- library with utility functions used throughou the suite
+rfsuite.utils = assert(rfsuite.compiler.loadfile("lib/utils.lua"))(rfsuite.config)
+
+rfsuite.app = assert(rfsuite.compiler.loadfile("app/app.lua"))(rfsuite.config)
+
 
 -- 
 -- This script initializes the `rfsuite` tasks and background task.
@@ -115,78 +157,21 @@ rfsuite.i18n.load()
 -- The `rfsuite.compiler.loadfile` function is used to load the "tasks/tasks.lua" file, and `assert` ensures that the file is loaded successfully.
 -- The loaded file is then executed with the `config` parameter, and its return value is assigned to `rfsuite.tasks`.
 -- tasks
-rfsuite.tasks = assert(rfsuite.compiler.loadfile("tasks/tasks.lua"))(config)
+rfsuite.tasks = assert(rfsuite.compiler.loadfile("tasks/tasks.lua"))(rfsuite.config)
 
 -- LuaFormatter off
 
+-- configure the flight mode
+rfsuite.flightmode = {}
+rfsuite.flightmode.current = "preflight"
 
---[[
-This script initializes various session parameters for the rfsuite application to nil.
-The parameters include:
-- tailMode: Mode for the tail rotor.
-- swashMode: Mode for the swashplate.
-- activeProfile: Currently active profile.
-- activeRateProfile: Currently active rate profile.
-- activeProfileLast: Last active profile.
-- activeRateLast: Last active rate profile.
-- servoCount: Number of servos.
-- servoOverride: Override setting for servos.
-- clockSet: Clock setting.
-- apiVersion: Version of the API.
-- lastLabel: Last label used.
-- rssiSensor: RSSI sensor value.
-- formLineCnt: Form line count.
-- rateProfile: Rate profile.
-- governorMode: Mode for the governor.
-- ethosRunningVersion: Version of the Ethos running.
-- lcdWidth: Width of the LCD.
-- lcdHeight: Height of the LCD.
-- mspSignature - uses for mostly in sim to save esc type
-- telemetryType = sport or crsf
-- repairSensors: makes the background task repair sensors
-- lastMemoryUsage.  Used to track memory usage for debugging
-- 
+-- Reset the session state
+rfsuite.utils.session()
 
--- Every attempt should be made if using session vars to record them here with a nil
--- to prevent conflicts with other scripts that may use the same session vars.
-]]
-rfsuite.session.tailMode = nil
-rfsuite.session.swashMode = nil
-rfsuite.session.activeProfile = nil
-rfsuite.session.activeRateProfile = nil
-rfsuite.session.activeProfileLast = nil
-rfsuite.session.activeRateLast = nil
-rfsuite.session.servoCount = nil
-rfsuite.session.servoOverride = nil
-rfsuite.session.clockSet = nil
-rfsuite.session.apiVersion = nil
-rfsuite.session.activeProfile = nil
-rfsuite.session.activeRateProfile = nil
-rfsuite.session.activeProfileLast = nil
-rfsuite.session.activeRateLast = nil
-rfsuite.session.servoCount = nil
-rfsuite.session.servoOverride = nil
-rfsuite.session.clockSet = nil
-rfsuite.session.lastLabel = nil
-rfsuite.session.tailMode = nil
-rfsuite.session.swashMode = nil
-rfsuite.session.formLineCnt = nil
-rfsuite.session.rateProfile = nil
-rfsuite.session.governorMode = nil
-rfsuite.session.servoOverride = nil
-rfsuite.session.ethosRunningVersion = nil
-rfsuite.session.lcdWidth = nil
-rfsuite.session.lcdHeight = nil
-rfsuite.session.mspSignature = nil
-rfsuite.session.telemetryState = nil
-rfsuite.session.telemetryType = nil
-rfsuite.session.telemetryTypeChanged = nil
-rfsuite.session.telemetrySensor = nil
-rfsuite.session.repairSensors = false
-rfsuite.session.locale = system.getLocale()
-rfsuite.session.lastMemoryUsage = nil
-rfsuite.session.mcu_id = nil
-
+-- when running in sim mode we can trigger events in tasks/simevent/simevent.lua
+-- this is used to trigger events in the simulator that are hard to do without a physical radio
+rfsuite.simevent = {}
+rfsuite.simevent.telemetry_state = true
 
 --- Retrieves the version information of the rfsuite module.
 --- 
@@ -201,13 +186,13 @@ rfsuite.session.mcu_id = nil
 ---   - `revision` (number): The revision version number.
 ---   - `suffix` (string): The version suffix (e.g., "alpha", "beta").
 function rfsuite.version()
-    local version = config.version.major .. "." .. config.version.minor .. "." .. config.version.revision .. "-" .. config.version.suffix
+    local version = rfsuite.config.version.major .. "." .. rfsuite.config.version.minor .. "." .. rfsuite.config.version.revision .. "-" .. rfsuite.config.version.suffix
     return {
         version = version,
-        major = config.version.major,
-        minor = config.version.minor,
-        revision = config.version.revision,
-        suffix = config.version.suffix
+        major = rfsuite.config.version.major,
+        minor = rfsuite.config.version.minor,
+        revision = rfsuite.config.version.revision,
+        suffix = rfsuite.config.version.suffix
     }
 end
 
@@ -247,8 +232,8 @@ local function init()
     if not rfsuite.utils.ethosVersionAtLeast() then
 
         system.registerSystemTool({
-            name = config.toolName,
-            icon = config.icon_unsupported ,
+            name = rfsuite.config.toolName,
+            icon = rfsuite.config.icon_unsupported ,
             create = function () end,
             wakeup = function () 
                         lcd.invalidate()
@@ -258,7 +243,7 @@ local function init()
                         local w, h = lcd.getWindowSize()
                         local textColor = lcd.RGB(255, 255, 255, 1) 
                         lcd.color(textColor)
-                        lcd.font(FONT_STD)
+                        lcd.font(FONT_M)
                         local badVersionMsg = string.format("ETHOS < V%d.%d.%d", table.unpack(config.ethosVersion))
                         local textWidth, textHeight = lcd.getTextSize(badVersionMsg)
                         local x = (w - textWidth) / 2
@@ -275,8 +260,8 @@ local function init()
     -- This tool handles events, creation, wakeup, painting, and closing.
     system.registerSystemTool({
         event = rfsuite.app.event,
-        name = config.toolName,
-        icon = config.icon,
+        name = rfsuite.config.toolName,
+        icon = rfsuite.config.icon,
         create = rfsuite.app.create,
         wakeup = rfsuite.app.wakeup,
         paint = rfsuite.app.paint,
@@ -285,21 +270,22 @@ local function init()
 
     -- Registers the log tool with the specified configuration.
     -- This tool handles events, creation, wakeup, painting, and closing.
-    system.registerSystemTool({
-        event = rfsuite.app.event,
-        name = config.toolName,
-        icon = config.icon_logtool,
-        create = rfsuite.app.create_logtool,
-        wakeup = rfsuite.app.wakeup,
-        paint = rfsuite.app.paint,
-        close = rfsuite.app.close
-    })
+ -- disabled for now as can be reached via main tool - tbd
+ --   system.registerSystemTool({
+ --       event = rfsuite.app.event,
+ --       name = config.toolName,
+ --       icon = config.icon_logtool,
+ --       create = rfsuite.app.create_logtool,
+ --       wakeup = rfsuite.app.wakeup,
+ --       paint = rfsuite.app.paint,
+ --       close = rfsuite.app.close
+ --   })
 
     -- Registers a background task with the specified configuration.
     -- This task handles wakeup and event processing.
     system.registerTask({
-        name = config.bgTaskName,
-        key = config.bgTaskKey,
+        name = rfsuite.config.bgTaskName,
+        key = rfsuite.config.bgTaskKey,
         wakeup = rfsuite.tasks.wakeup,
         event = rfsuite.tasks.event
     })
@@ -309,14 +295,15 @@ local function init()
     local cachePath = "cache/" .. cacheFile
     local widgetList
     
-    -- Try to load from cache if it exists
-    if io.open(cachePath, "r") then
-        local ok, cached = pcall(dofile, cachePath)
+    -- Try loading cache if it exists
+    local loadf, loadErr = rfsuite.compiler.loadfile(cachePath)
+    if loadf then
+        local ok, cached = pcall(loadf)
         if ok and type(cached) == "table" then
             widgetList = cached
             rfsuite.utils.log("[cache] Loaded widget list from cache","info")
         else
-            rfsuite.utils.log("[cache] Failed to load cache, rebuilding...","info")
+            rfsuite.utils.log("[cache] Bad cache, rebuilding: "..tostring(cached),"info")
         end
     end
     
@@ -381,6 +368,7 @@ local function init()
                     create = scriptModule.create,
                     paint = scriptModule.paint,
                     wakeup = scriptModule.wakeup,
+                    build = scriptModule.build,
                     close = scriptModule.close,
                     configure = scriptModule.configure,
                     read = scriptModule.read,

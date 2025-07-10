@@ -80,7 +80,10 @@ end
 ]]
 function MspQueueController:processQueue()
 
-    if rfsuite.config.logMSPQueue then
+    local mspBusyTimeout = 2.0
+    self.mspBusyStart = self.mspBusyStart or os.clock()
+
+    if rfsuite.preferences.developer.logmspQueue then
         local count = #self.messageQueue
         if count ~= lastQueueCount then
             rfsuite.utils.log("MSP Queue: " .. count .. " messages in queue","info")
@@ -90,9 +93,19 @@ function MspQueueController:processQueue()
 
     if self:isProcessed() then
         rfsuite.app.triggers.mspBusy = false
+        self.mspBusyStart = nil
         return
     end
-    rfsuite.app.triggers.mspBusy = true
+
+    -- Timeout watchdog
+    if self.mspBusyStart and (os.clock() - self.mspBusyStart) > mspBusyTimeout then
+        rfsuite.utils.log("MSP busy timeout exceeded. Forcing clear.", "warn")
+        rfsuite.app.triggers.mspBusy = false
+        self.mspBusyStart = nil
+        return
+    end
+
+    rfsuite.app.triggers.mspBusy = true    
 
     if rfsuite.session.telemetrySensor then
         local module = model.getModule(rfsuite.session.telemetrySensor:module())
@@ -150,7 +163,8 @@ function MspQueueController:processQueue()
     if self.currentMessage and os.clock() - self.currentMessageStartTime > (self.currentMessage.timeout or self.timeout) then
         if self.currentMessage.errorHandler then self.currentMessage:errorHandler() end
         rfsuite.utils.log("Message timeout exceeded. Flushing queue.","debug")
-        self:clear()
+        self.currentMessage = nil
+        self.uuid = nil
         return
     end
 

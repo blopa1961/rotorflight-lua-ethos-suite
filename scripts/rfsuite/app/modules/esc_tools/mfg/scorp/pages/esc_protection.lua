@@ -1,7 +1,8 @@
 
 local folder = "scorp"
+local i18n = rfsuite.i18n.get
 
-local mspapi = {
+local apidata = {
     api = {
         [1] = "ESC_PARAMETERS_SCORPION",
     },
@@ -9,12 +10,12 @@ local mspapi = {
         labels = {
         },
         fields = {
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.scorp.protection_delay"), mspapi = 1, apikey="protection_delay"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.scorp.cutoff_handling"), mspapi = 1, apikey="cutoff_handling"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.scorp.max_temperature"), mspapi = 1, apikey="max_temperature"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.scorp.max_current"),     mspapi = 1, apikey="max_current"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.scorp.min_voltage"),     mspapi = 1, apikey="min_voltage"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.scorp.max_used"),        mspapi = 1, apikey="max_used"}
+            {t = i18n("app.modules.esc_tools.mfg.scorp.protection_delay"), mspapi = 1, apikey="protection_delay"},
+            {t = i18n("app.modules.esc_tools.mfg.scorp.cutoff_handling"), mspapi = 1, apikey="cutoff_handling"},
+            {t = i18n("app.modules.esc_tools.mfg.scorp.max_temperature"), mspapi = 1, apikey="max_temperature"},
+            {t = i18n("app.modules.esc_tools.mfg.scorp.max_current"),     mspapi = 1, apikey="max_current"},
+            {t = i18n("app.modules.esc_tools.mfg.scorp.min_voltage"),     mspapi = 1, apikey="min_voltage"},
+            {t = i18n("app.modules.esc_tools.mfg.scorp.max_used"),        mspapi = 1, apikey="max_used"}
         }
     }                 
 }
@@ -47,7 +48,7 @@ local function event(widget, category, value, x, y)
 end
 
 return {
-    mspapi=mspapi,
+    apidata = apidata,
     eepromWrite = false,
     reboot = false,
     title = "Limits",
@@ -61,7 +62,7 @@ return {
     navButtons = {menu = true, save = true, reload = true, tool = false, help = false},
     onNavMenu = onNavMenu,
     event = event,
-    pageTitle = rfsuite.i18n.get("app.modules.esc_tools.name") .. " / " ..  rfsuite.i18n.get("app.modules.esc_tools.mfg.scorp.name") .. " / " .. rfsuite.i18n.get("app.modules.esc_tools.mfg.scorp.limits"),
+    pageTitle = i18n("app.modules.esc_tools.name") .. " / " ..  i18n("app.modules.esc_tools.mfg.scorp.name") .. " / " .. i18n("app.modules.esc_tools.mfg.scorp.limits"),
     headerLine = rfsuite.escHeaderLineText,
-    extraMsgOnSave = rfsuite.i18n.get("app.modules.esc_tools.mfg.scorp.extra_msg_save"), 
+    extraMsgOnSave = i18n("app.modules.esc_tools.mfg.scorp.extra_msg_save"), 
 }

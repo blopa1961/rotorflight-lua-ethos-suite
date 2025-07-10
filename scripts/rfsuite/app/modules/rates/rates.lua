@@ -2,7 +2,7 @@ local labels = {}
 local tables = {}
 
 local activateWakeup = false
-
+local i18n = rfsuite.i18n.get
 
 tables[0] = "app/modules/rates/ratetables/none.lua"
 tables[1] = "app/modules/rates/ratetables/betaflight.lua"
@@ -12,21 +12,21 @@ tables[4] = "app/modules/rates/ratetables/actual.lua"
 tables[5] = "app/modules/rates/ratetables/quick.lua"
 
 if rfsuite.session.activeRateTable == nil then 
-    rfsuite.session.activeRateTable = rfsuite.preferences.defaultRateProfile 
+    rfsuite.session.activeRateTable = rfsuite.config.defaultRateProfile 
 end
 
 
 rfsuite.utils.log("Loading Rate Table: " .. tables[rfsuite.session.activeRateTable],"debug")
-local mspapi = assert(rfsuite.compiler.loadfile(tables[rfsuite.session.activeRateTable]))()
-local mytable = mspapi.formdata
+local apidata = assert(rfsuite.compiler.loadfile(tables[rfsuite.session.activeRateTable]))()
+local mytable = apidata.formdata
 
 
 
 local function postLoad(self)
 
-    local v = mspapi.values[mspapi.api[1]].rates_type
+    local v = apidata.values[apidata.api[1]].rates_type
     
-    rfsuite.utils.log("Active Rate Table: " .. rfsuite.session.activeRateTable,"info")
+    rfsuite.utils.log("Active Rate Table: " .. rfsuite.session.activeRateTable,"debug")
 
     if v ~= rfsuite.session.activeRateTable then
         rfsuite.utils.log("Switching Rate Table: " .. v,"info")
@@ -68,11 +68,11 @@ local function openPage(idx, title, script)
 
     rfsuite.app.ui.fieldHeader(title)
 
-    rfsuite.utils.log("Merging form data from mspapi","debug")
-    rfsuite.app.Page.fields = rfsuite.app.Page.mspapi.formdata.fields
-    rfsuite.app.Page.labels = rfsuite.app.Page.mspapi.formdata.labels
-    rfsuite.app.Page.rows = rfsuite.app.Page.mspapi.formdata.rows
-    rfsuite.app.Page.cols = rfsuite.app.Page.mspapi.formdata.cols
+    rfsuite.utils.log("Merging form data from apidata","debug")
+    rfsuite.app.Page.fields = rfsuite.app.Page.apidata.formdata.fields
+    rfsuite.app.Page.labels = rfsuite.app.Page.apidata.formdata.labels
+    rfsuite.app.Page.rows = rfsuite.app.Page.apidata.formdata.rows
+    rfsuite.app.Page.cols = rfsuite.app.Page.apidata.formdata.cols
 
     local numCols
     if rfsuite.app.Page.cols ~= nil then
@@ -82,7 +82,7 @@ local function openPage(idx, title, script)
     end
 
     -- we dont use the global due to scrollers
-    local screenWidth, screenHeight = rfsuite.app.getWindowSize()
+    local screenWidth, screenHeight = rfsuite.app.utils.getWindowSize()
 
     local padding = 10
     local paddingTop = rfsuite.app.radio.linePaddingTop
@@ -93,10 +93,10 @@ local function openPage(idx, title, script)
     local positions_r = {}
     local pos
 
-    --line = form.addLine(mspapi.formdata.name)
+    --line = form.addLine(apidata.formdata.name)
     line = form.addLine("")
     pos = {x = 0, y = paddingTop, w = 200, h = h}
-    rfsuite.app.formFields['col_0'] = form.addStaticText(line, pos, mspapi.formdata.name)
+    rfsuite.app.formFields['col_0'] = form.addStaticText(line, pos, apidata.formdata.name)
 
     local loc = numCols
     local posX = screenWidth - paddingRight
@@ -111,7 +111,7 @@ local function openPage(idx, title, script)
         positions[loc] = posX - w
         positions_r[c] = posX - w
 
-        lcd.font(FONT_STD)
+        lcd.font(FONT_M)
         --local tsizeW, tsizeH = lcd.getTextSize(colLabel)
         colLabel = rightAlignText(rfsuite.session.colWidth, colLabel)
 
@@ -210,8 +210,8 @@ local function onHelpMenu()
 end    
 
 return {
-    mspapi = mspapi,
-    title = rfsuite.i18n.get("app.modules.rates.name"),
+    apidata = apidata,
+    title = i18n("app.modules.rates.name"),
     reboot = false,
     eepromWrite = true,
     refreshOnRateChange = true,

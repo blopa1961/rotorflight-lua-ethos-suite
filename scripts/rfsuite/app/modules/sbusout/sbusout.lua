@@ -6,7 +6,7 @@ local lastServoCountTime = os.clock()
 local enableWakeup = false
 local wakeupScheduler = os.clock()
 local validSerialConfig = false
-
+local i18n = rfsuite.i18n.get
 local function openPage(pidx, title, script)
 
 
@@ -22,10 +22,10 @@ local function openPage(pidx, title, script)
     rfsuite.app.lastScript = script
 
     -- size of buttons
-    if rfsuite.preferences.iconSize == nil or rfsuite.preferences.iconSize == "" then
-        rfsuite.preferences.iconSize = 1
+    if rfsuite.preferences.general.iconsize == nil or rfsuite.preferences.general.iconsize == "" then
+        rfsuite.preferences.general.iconsize = 1
     else
-        rfsuite.preferences.iconSize = tonumber(rfsuite.preferences.iconSize)
+        rfsuite.preferences.general.iconsize = tonumber(rfsuite.preferences.general.iconsize)
     end
 
     local w, h = rfsuite.utils.getWindowSize()
@@ -39,7 +39,7 @@ local function openPage(pidx, title, script)
     buttonW = 100
     local x = windowWidth - buttonW - 10
 
-    rfsuite.app.ui.fieldHeader(rfsuite.i18n.get("app.modules.sbusout.title") .. "")
+    rfsuite.app.ui.fieldHeader(i18n("app.modules.sbusout.title") .. "")
 
     local buttonW
     local buttonH
@@ -48,14 +48,14 @@ local function openPage(pidx, title, script)
 
     -- TEXT ICONS
     -- TEXT ICONS
-    if rfsuite.preferences.iconSize == 0 then
+    if rfsuite.preferences.general.iconsize == 0 then
         padding = rfsuite.app.radio.buttonPaddingSmall
-        buttonW = (rfsuite.session.lcdWidth - padding) / rfsuite.app.radio.buttonsPerRow - padding
+        buttonW = (rfsuite.app.lcdWidth - padding) / rfsuite.app.radio.buttonsPerRow - padding
         buttonH = rfsuite.app.radio.navbuttonHeight
         numPerRow = rfsuite.app.radio.buttonsPerRow
     end
     -- SMALL ICONS
-    if rfsuite.preferences.iconSize == 1 then
+    if rfsuite.preferences.general.iconsize == 1 then
 
         padding = rfsuite.app.radio.buttonPaddingSmall
         buttonW = rfsuite.app.radio.buttonWidthSmall
@@ -63,7 +63,7 @@ local function openPage(pidx, title, script)
         numPerRow = rfsuite.app.radio.buttonsPerRowSmall
     end
     -- LARGE ICONS
-    if rfsuite.preferences.iconSize == 2 then
+    if rfsuite.preferences.general.iconsize == 2 then
 
         padding = rfsuite.app.radio.buttonPadding
         buttonW = rfsuite.app.radio.buttonWidth
@@ -75,36 +75,36 @@ local function openPage(pidx, title, script)
     local bx = 0
 
     if rfsuite.app.gfx_buttons["sbuschannel"] == nil then rfsuite.app.gfx_buttons["sbuschannel"] = {} end
-    if rfsuite.app.menuLastSelected["sbuschannel"] == nil then rfsuite.app.menuLastSelected["sbuschannel"] = 0 end
+    if rfsuite.preferences.menulastselected["sbuschannel"] == nil then rfsuite.preferences.menulastselected["sbuschannel"] = 0 end
     if rfsuite.currentSbusServoIndex == nil then rfsuite.currentSbusServoIndex = 0 end
 
     for pidx = 0, 15 do
 
         if lc == 0 then
-            if rfsuite.preferences.iconSize == 0 then y = form.height() + rfsuite.app.radio.buttonPaddingSmall end
-            if rfsuite.preferences.iconSize == 1 then y = form.height() + rfsuite.app.radio.buttonPaddingSmall end
-            if rfsuite.preferences.iconSize == 2 then y = form.height() + rfsuite.app.radio.buttonPadding end
+            if rfsuite.preferences.general.iconsize == 0 then y = form.height() + rfsuite.app.radio.buttonPaddingSmall end
+            if rfsuite.preferences.general.iconsize == 1 then y = form.height() + rfsuite.app.radio.buttonPaddingSmall end
+            if rfsuite.preferences.general.iconsize == 2 then y = form.height() + rfsuite.app.radio.buttonPadding end
         end
 
         if lc >= 0 then bx = (buttonW + padding) * lc end
 
-        if rfsuite.preferences.iconSize ~= 0 then
+        if rfsuite.preferences.general.iconsize ~= 0 then
             if rfsuite.app.gfx_buttons["sbuschannel"][pidx] == nil then rfsuite.app.gfx_buttons["sbuschannel"][pidx] = lcd.loadMask("app/modules/sbusout/gfx/ch" .. tostring(pidx + 1) .. ".png") end
         else
             rfsuite.app.gfx_buttons["sbuschannel"][pidx] = nil
         end
 
         rfsuite.app.formFields[pidx] = form.addButton(nil, {x = bx, y = y, w = buttonW, h = buttonH}, {
-            text = rfsuite.i18n.get("app.modules.sbusout.channel_prefix") .. "" .. tostring(pidx + 1),
+            text = i18n("app.modules.sbusout.channel_prefix") .. "" .. tostring(pidx + 1),
             icon = rfsuite.app.gfx_buttons["sbuschannel"][pidx],
             options = FONT_S,
             paint = function()
             end,
             press = function()
-                rfsuite.app.menuLastSelected["sbuschannel"] = pidx
+                rfsuite.preferences.menulastselected["sbuschannel"] = pidx
                 rfsuite.currentSbusServoIndex = pidx
                 rfsuite.app.ui.progressDisplay()
-                rfsuite.app.ui.openPage(pidx, rfsuite.i18n.get("app.modules.sbusout.channel_page") .. "" .. tostring(rfsuite.currentSbusServoIndex + 1), "sbusout/sbusout_tool.lua")
+                rfsuite.app.ui.openPage(pidx, i18n("app.modules.sbusout.channel_page") .. "" .. tostring(rfsuite.currentSbusServoIndex + 1), "sbusout/sbusout_tool.lua")
             end
         })
 
@@ -167,7 +167,7 @@ local function wakeup()
     elseif enableWakeup == true and validSerialConfig == true then
         for pidx = 0, 15 do
             rfsuite.app.formFields[pidx]:enable(true)
-            if rfsuite.app.menuLastSelected["sbuschannel"] == rfsuite.currentSbusServoIndex then rfsuite.app.formFields[rfsuite.currentSbusServoIndex]:focus() end
+            if rfsuite.preferences.menulastselected["sbuschannel"] == rfsuite.currentSbusServoIndex then rfsuite.app.formFields[rfsuite.currentSbusServoIndex]:focus() end
         end
     end
 

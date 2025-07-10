@@ -7,8 +7,9 @@ local mspSignature = ESC.mspSignature
 local simulatorResponse = ESC.simulatorResponse
 local activeFields = ESC.getActiveFields(rfsuite.session.escBuffer)
 local activateWakeup = false
+local i18n = rfsuite.i18n.get
 
-local mspapi = {
+local apidata = {
     api = {
         [1] = "ESC_PARAMETERS_XDFLY",
     },
@@ -16,23 +17,23 @@ local mspapi = {
         labels = {
         },
         fields = {
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.lv_bec_voltage"),  activeFieldPos = 5, type = 1, mspapi = 1, apikey = "lv_bec_voltage"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.hv_bec_voltage"),  activeFieldPos = 11, type = 1, mspapi = 1, apikey = "hv_bec_voltage"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.motor_direction"), activeFieldPos = 6, type = 1, mspapi = 1, apikey = "motor_direction"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.startup_power"),   activeFieldPos = 12, type = 1, mspapi = 1, apikey = "startup_power"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.led_color"),       activeFieldPos = 18, type = 1, mspapi = 1, apikey = "led_color"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.smart_fan"),       activeFieldPos = 19, type = 1, mspapi = 1, apikey = "smart_fan"}
+            {t = i18n("app.modules.esc_tools.mfg.xdfly.lv_bec_voltage"),  activeFieldPos = 5, type = 1, mspapi = 1, apikey = "lv_bec_voltage"},
+            {t = i18n("app.modules.esc_tools.mfg.xdfly.hv_bec_voltage"),  activeFieldPos = 11, type = 1, mspapi = 1, apikey = "hv_bec_voltage"},
+            {t = i18n("app.modules.esc_tools.mfg.xdfly.motor_direction"), activeFieldPos = 6, type = 1, mspapi = 1, apikey = "motor_direction"},
+            {t = i18n("app.modules.esc_tools.mfg.xdfly.startup_power"),   activeFieldPos = 12, type = 1, mspapi = 1, apikey = "startup_power"},
+            {t = i18n("app.modules.esc_tools.mfg.xdfly.led_color"),       activeFieldPos = 18, type = 1, mspapi = 1, apikey = "led_color"},
+            {t = i18n("app.modules.esc_tools.mfg.xdfly.smart_fan"),       activeFieldPos = 19, type = 1, mspapi = 1, apikey = "smart_fan"}
         }
     }                 
 }
 
 -- This code will disable the field if the ESC does not support it
 -- It now uses the activeFieldsPos element to associate to the activeFields table
-for i = #mspapi.formdata.fields, 1, -1 do 
-    local f = mspapi.formdata.fields[i]
+for i = #apidata.formdata.fields, 1, -1 do 
+    local f = apidata.formdata.fields[i]
     local fieldIndex = f.activeFieldPos  -- Use activeFieldPos for association
     if activeFields[fieldIndex] == 0 then
-        table.remove(mspapi.formdata.fields, i)  -- Remove the field from the table
+        table.remove(apidata.formdata.fields, i)  -- Remove the field from the table
     end
 end
 
@@ -70,7 +71,7 @@ local foundEsc = false
 local foundEscDone = false
 
 return {
-    mspapi=mspapi,
+    apidata = apidata,
     eepromWrite = false,
     reboot = false,
     escinfo = escinfo,
@@ -79,7 +80,7 @@ return {
     navButtons = {menu = true, save = true, reload = true, tool = false, help = false},
     onNavMenu = onNavMenu,
     event = event,
-    pageTitle = rfsuite.i18n.get("app.modules.esc_tools.name") .. " / " ..  rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.name") .. " / " .. rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.basic"),
+    pageTitle = i18n("app.modules.esc_tools.name") .. " / " ..  i18n("app.modules.esc_tools.mfg.xdfly.name") .. " / " .. i18n("app.modules.esc_tools.mfg.xdfly.basic"),
     headerLine = rfsuite.escHeaderLineText,
     wakeup = wakeup
 }

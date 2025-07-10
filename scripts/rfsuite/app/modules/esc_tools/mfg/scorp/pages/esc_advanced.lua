@@ -1,8 +1,8 @@
 
 
 local folder = "scorp"
-
-local mspapi = {
+local i18n = rfsuite.i18n.get
+local apidata = {
     api = {
         [1] = "ESC_PARAMETERS_SCORPION",
     },
@@ -10,12 +10,12 @@ local mspapi = {
         labels = {
         },
         fields = {
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.scorp.soft_start_time"),     mspapi=1, apikey="soft_start_time"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.scorp.runup_time"),          mspapi=1, apikey="runup_time"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.scorp.bailout"),             mspapi=1, apikey="bailout"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.scorp.gov_proportional"),    mspapi=1, apikey="gov_proportional"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.scorp.gov_integral"),        mspapi=1, apikey="gov_integral"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.scorp.motor_startup_sound"), mspapi=1, apikey="motor_startup_sound", type = 1, },
+            {t = i18n("app.modules.esc_tools.mfg.scorp.soft_start_time"),     mspapi=1, apikey="soft_start_time"},
+            {t = i18n("app.modules.esc_tools.mfg.scorp.runup_time"),          mspapi=1, apikey="runup_time"},
+            {t = i18n("app.modules.esc_tools.mfg.scorp.bailout"),             mspapi=1, apikey="bailout"},
+            {t = i18n("app.modules.esc_tools.mfg.scorp.gov_proportional"),    mspapi=1, apikey="gov_proportional"},
+            {t = i18n("app.modules.esc_tools.mfg.scorp.gov_integral"),        mspapi=1, apikey="gov_integral"},
+            {t = i18n("app.modules.esc_tools.mfg.scorp.motor_startup_sound"), mspapi=1, apikey="motor_startup_sound", type = 1, },
         }
     }                 
 }
@@ -44,7 +44,7 @@ local function event(widget, category, value, x, y)
 end
 
 return {
-    mspapi=mspapi,
+    apidata = apidata,
     eepromWrite = false,
     reboot = false,
     escinfo = escinfo,
@@ -57,7 +57,7 @@ return {
     navButtons = {menu = true, save = true, reload = true, tool = false, help = false},
     onNavMenu = onNavMenu,
     event = event,
-    pageTitle = rfsuite.i18n.get("app.modules.esc_tools.name") .. " / " ..  rfsuite.i18n.get("app.modules.esc_tools.mfg.scorp.name") .. " / " .. rfsuite.i18n.get("app.modules.esc_tools.mfg.scorp.advanced"),
+    pageTitle = i18n("app.modules.esc_tools.name") .. " / " ..  i18n("app.modules.esc_tools.mfg.scorp.name") .. " / " .. i18n("app.modules.esc_tools.mfg.scorp.advanced"),
     headerLine = rfsuite.escHeaderLineText,
-    extraMsgOnSave = rfsuite.i18n.get("app.modules.esc_tools.mfg.scorp.extra_msg_save"), 
+    extraMsgOnSave = i18n("app.modules.esc_tools.mfg.scorp.extra_msg_save"), 
 }

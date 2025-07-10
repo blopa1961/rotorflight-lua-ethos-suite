@@ -2,7 +2,7 @@ local fields = {}
 local rows = {}
 local cols = {}
 
-local total_bytes = rfsuite.preferences.mspExpBytes
+local total_bytes = rfsuite.preferences.developer.mspexpbytes
 local fieldMap = {}
 
 -- Dirty flags and enable control
@@ -90,32 +90,32 @@ local function generateMSPAPI(numLabels)
         numLabels = 16
     end
         
-    local mspapi = {
+    local apidata = {
         api = {'EXPERIMENTAL'},
         formdata = {labels = {}, fields = {}}
     }
 
     for i = 1, numLabels do
-        table.insert(mspapi.formdata.labels, {t = tostring(i), inline_size = 17, label = i})
+        table.insert(apidata.formdata.labels, {t = tostring(i), inline_size = 17, label = i})
 
-        table.insert(mspapi.formdata.fields, {
+        table.insert(apidata.formdata.fields, {
             t = "UINT8", isUINT8 = true, label = i, inline = 2, mspapi = 1, apikey = "exp_uint" .. i,
             min = 0, max = 255,
             onChange = function() uint8_dirty = true end
         })
 
-        table.insert(mspapi.formdata.fields, {
+        table.insert(apidata.formdata.fields, {
             t = "INT8", isINT8 = true, label = i, inline = 1, mspapi = 1, apikey = "exp_int" .. i,
             min = -128, max = 127,
             onChange = function() int8_dirty = true end
         })
     end
 
-    return mspapi
+    return apidata
 end
 
 -- Init API
-local mspapi = generateMSPAPI(rfsuite.preferences.mspExpBytes)
+local apidata = generateMSPAPI(rfsuite.preferences.developer.mspexpbytes)
 
 -- Periodic updater (called each wakeup)
 local function periodicSync()
@@ -133,7 +133,7 @@ local function postLoad()
     enableWakeup = false
 
     -- Check if we have received any data
-    if rfsuite.app.Page.mspapi.receivedBytesCount['EXPERIMENTAL'] == 0 then
+    if rfsuite.app.Page.apidata.receivedBytesCount['EXPERIMENTAL'] == 0 then
         rfsuite.app.triggers.closeProgressLoader = true
         rfsuite.app.ui.disableAllFields()
         rfsuite.app.ui.disableAllNavigationFields()
@@ -141,9 +141,9 @@ local function postLoad()
         return
     end
 
-    if total_bytes ~= rfsuite.app.Page.mspapi.receivedBytesCount['EXPERIMENTAL'] then
+    if total_bytes ~= rfsuite.app.Page.apidata.receivedBytesCount['EXPERIMENTAL'] then
 
-        rfsuite.preferences.mspExpBytes = rfsuite.app.Page.mspapi.receivedBytesCount['EXPERIMENTAL']
+        rfsuite.preferences.developer.mspexpbytes = rfsuite.app.Page.apidata.receivedBytesCount['EXPERIMENTAL']
         rfsuite.app.triggers.reloadFull = true
     end
 
@@ -171,7 +171,7 @@ end
 
 -- Return page definition
 return {
-    mspapi = mspapi,
+    apidata = apidata,
     title = "Experimental",
     navButtons = {menu = true, save = true, reload = true, help = true},
     eepromWrite = true,

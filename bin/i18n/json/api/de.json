@@ -256,6 +256,11 @@
       "translation": "Deaktiviert",
       "needs_translation": "false"
     },
+    "tbl_auto": {
+      "english": "Auto",
+      "translation": "Auto",
+      "needs_translation": "true"
+    },
     "starting_torque": {
       "english": "Starting torque for the motor",
       "translation": "Anlaufmoment fuer den Motor",
@@ -964,6 +969,13 @@
       "needs_translation": "false"
     }
   },
+  "PILOT_CONFIG": {
+    "model_param1_value": {
+      "english": "Set this to the expected flight time in seconds.  The transmitter will beep when the flight time is reached.",
+      "translation": "Set this to the expected flight time in seconds.  The transmitter will beep when the flight time is reached.",
+      "needs_translation": "true"
+    }
+  },
   "BATTERY_CONFIG": {
     "vbatmincellvoltage": {
       "english": "The minimum voltage per cell before the low voltage alarm is triggered.",
@@ -1328,7 +1340,7 @@
       "needs_translation": "false"
     },
     "tbl_yellow": {
-      "english": "YELOW",
+      "english": "YELLOW",
       "translation": "Gelb",
       "needs_translation": "false"
     },

@@ -3,44 +3,45 @@ local activateWakeup = false
 local extraMsgOnSave = nil
 local resetRates = false
 local doFullReload = false
+local i18n = rfsuite.i18n.get
 
 if rfsuite.session.activeRateTable == nil then 
-    rfsuite.session.activeRateTable = rfsuite.preferences.defaultRateProfile 
+    rfsuite.session.activeRateTable = rfsuite.config.defaultRateProfile 
 end
 
 local rows
 if rfsuite.session.apiVersion >= 12.08 then
     rows = {
-        rfsuite.i18n.get("app.modules.rates_advanced.response_time"),
-        rfsuite.i18n.get("app.modules.rates_advanced.acc_limit"),
-        rfsuite.i18n.get("app.modules.rates_advanced.setpoint_boost_gain"),
-        rfsuite.i18n.get("app.modules.rates_advanced.setpoint_boost_cutoff"),
-        rfsuite.i18n.get("app.modules.rates_advanced.dyn_ceiling_gain"),
-        rfsuite.i18n.get("app.modules.rates_advanced.dyn_deadband_gain"),
-        rfsuite.i18n.get("app.modules.rates_advanced.dyn_deadband_filter"),
+        i18n("app.modules.rates_advanced.response_time"),
+        i18n("app.modules.rates_advanced.acc_limit"),
+        i18n("app.modules.rates_advanced.setpoint_boost_gain"),
+        i18n("app.modules.rates_advanced.setpoint_boost_cutoff"),
+        i18n("app.modules.rates_advanced.dyn_ceiling_gain"),
+        i18n("app.modules.rates_advanced.dyn_deadband_gain"),
+        i18n("app.modules.rates_advanced.dyn_deadband_filter"),
     }
 else
     rows = {
-        rfsuite.i18n.get("app.modules.rates_advanced.response_time"),
-        rfsuite.i18n.get("app.modules.rates_advanced.acc_limit"),
+        i18n("app.modules.rates_advanced.response_time"),
+        i18n("app.modules.rates_advanced.acc_limit"),
     }
 end
 
    
-local mspapi = {
+local apidata = {
     api = {
         [1] = 'RC_TUNING',
     },
     formdata = {
-        name = rfsuite.i18n.get("app.modules.rates_advanced.dynamics"),
+        name = i18n("app.modules.rates_advanced.dynamics"),
         labels = {
         },
         rows = rows,
         cols = {
-            rfsuite.i18n.get("app.modules.rates_advanced.roll"),
-            rfsuite.i18n.get("app.modules.rates_advanced.pitch"),
-            rfsuite.i18n.get("app.modules.rates_advanced.yaw"),
-            rfsuite.i18n.get("app.modules.rates_advanced.col")
+            i18n("app.modules.rates_advanced.roll"),
+            i18n("app.modules.rates_advanced.pitch"),
+            i18n("app.modules.rates_advanced.yaw"),
+            i18n("app.modules.rates_advanced.col")
         },
         fields = {
             -- response time
@@ -110,7 +111,7 @@ local function openPage(idx, title, script)
     else
         numCols = 4
     end
-    local screenWidth = rfsuite.session.lcdWidth - 10
+    local screenWidth = rfsuite.app.lcdWidth - 10
     local padding = 10
     local paddingTop = rfsuite.app.radio.linePaddingTop
     local h = rfsuite.app.radio.navbuttonHeight
@@ -128,10 +129,10 @@ local function openPage(idx, title, script)
 
 
     rfsuite.utils.log("Merging form data from mspapi","debug")
-    rfsuite.app.Page.fields = rfsuite.app.Page.mspapi.formdata.fields
-    rfsuite.app.Page.labels = rfsuite.app.Page.mspapi.formdata.labels
-    rfsuite.app.Page.rows = rfsuite.app.Page.mspapi.formdata.rows
-    rfsuite.app.Page.cols = rfsuite.app.Page.mspapi.formdata.cols
+    rfsuite.app.Page.fields = rfsuite.app.Page.apidata.formdata.fields
+    rfsuite.app.Page.labels = rfsuite.app.Page.apidata.formdata.labels
+    rfsuite.app.Page.rows = rfsuite.app.Page.apidata.formdata.rows
+    rfsuite.app.Page.cols = rfsuite.app.Page.apidata.formdata.cols
 
     rfsuite.session.colWidth = w - paddingRight
 
@@ -142,7 +143,7 @@ local function openPage(idx, title, script)
         positions[loc] = posX - w
         positions_r[c] = posX - w
 
-        lcd.font(FONT_STD)
+        lcd.font(FONT_M)
         --local tsizeW, tsizeH = lcd.getTextSize(colLabel)
         colLabel = rightAlignText(rfsuite.session.colWidth, colLabel)
 
@@ -205,9 +206,9 @@ end
 
 local function postLoad(self)
 
-    local v = mspapi.values[mspapi.api[1]].rates_type
+    local v = apidata.values[apidata.api[1]].rates_type
     
-    rfsuite.utils.log("Active Rate Table: " .. rfsuite.session.activeRateTable,"info")
+    rfsuite.utils.log("Active Rate Table: " .. rfsuite.session.activeRateTable,"debug")
 
     if v ~= rfsuite.session.activeRateTable then
         rfsuite.utils.log("Switching Rate Table: " .. v,"info")
@@ -245,8 +246,8 @@ end
 
 
 return {
-    mspapi = mspapi,
-    title = rfsuite.i18n.get("app.modules.rates_advanced.name"),
+    apidata = apidata,
+    title = i18n("app.modules.rates_advanced.name"),
     reboot = false,
     openPage = openPage,
     eepromWrite = true,

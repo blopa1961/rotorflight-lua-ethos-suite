@@ -17,9 +17,10 @@
  * 
 ]] --
 local init = {
-    interval = 0.0025, -- run as often as possible
-    script = "msp.lua", -- run this script
-    msp = true, -- do not run if busy with msp [as this is msp we set to true as must run]
-    always_run = true, -- run on every loop
+    interval        = 0.05,      -- run every 0.025 seconds
+    script          = "msp.lua", -- run this script
+    linkrequired    = false,     -- run this script only if link is established  
+    spreadschedule  = false,     -- run on every loop  
+    simulatoronly   = false,     -- run this script in simulation mode                  
 }
 return init

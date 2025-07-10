@@ -1,6 +1,6 @@
 local activateWakeup = false
-
-local mspapi = {
+local i18n = rfsuite.i18n.get
+local apidata = {
     api = {
         [1] = 'PID_TUNING',
     },
@@ -8,17 +8,17 @@ local mspapi = {
         labels = {
         },
         rows = {
-            rfsuite.i18n.get("app.modules.pids.roll"),
-            rfsuite.i18n.get("app.modules.pids.pitch"),
-            rfsuite.i18n.get("app.modules.pids.yaw")
+            i18n("app.modules.pids.roll"),
+            i18n("app.modules.pids.pitch"),
+            i18n("app.modules.pids.yaw")
         },
         cols = {
-            rfsuite.i18n.get("app.modules.pids.p"),
-            rfsuite.i18n.get("app.modules.pids.i"),
-            rfsuite.i18n.get("app.modules.pids.d"),
-            rfsuite.i18n.get("app.modules.pids.f"),
-            rfsuite.i18n.get("app.modules.pids.o"),
-            rfsuite.i18n.get("app.modules.pids.b")
+            i18n("app.modules.pids.p"),
+            i18n("app.modules.pids.i"),
+            i18n("app.modules.pids.d"),
+            i18n("app.modules.pids.f"),
+            i18n("app.modules.pids.o"),
+            i18n("app.modules.pids.b")
         },
         fields = {
             -- P
@@ -75,7 +75,7 @@ local function openPage(idx, title, script)
     else
         numCols = 6
     end
-    local screenWidth = rfsuite.session.lcdWidth - 10
+    local screenWidth = rfsuite.app.lcdWidth - 10
     local padding = 10
     local paddingTop = rfsuite.app.radio.linePaddingTop
     local h = rfsuite.app.radio.navbuttonHeight
@@ -93,10 +93,10 @@ local function openPage(idx, title, script)
 
 
     rfsuite.utils.log("Merging form data from mspapi","debug")
-    rfsuite.app.Page.fields = rfsuite.app.Page.mspapi.formdata.fields
-    rfsuite.app.Page.labels = rfsuite.app.Page.mspapi.formdata.labels
-    rfsuite.app.Page.rows = rfsuite.app.Page.mspapi.formdata.rows
-    rfsuite.app.Page.cols = rfsuite.app.Page.mspapi.formdata.cols
+    rfsuite.app.Page.fields = rfsuite.app.Page.apidata.formdata.fields
+    rfsuite.app.Page.labels = rfsuite.app.Page.apidata.formdata.labels
+    rfsuite.app.Page.rows = rfsuite.app.Page.apidata.formdata.rows
+    rfsuite.app.Page.cols = rfsuite.app.Page.apidata.formdata.cols
 
     local c = 1
     while loc > 0 do
@@ -157,8 +157,8 @@ local function wakeup()
 end
 
 return {
-    mspapi = mspapi,
-    title = rfsuite.i18n.get("app.modules.pids.name"),
+    apidata = apidata,
+    title = i18n("app.modules.pids.name"),
     reboot = false,
     eepromWrite = true,
     refreshOnProfileChange = true,

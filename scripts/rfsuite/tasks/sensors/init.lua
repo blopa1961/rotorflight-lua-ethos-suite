@@ -17,10 +17,11 @@
  * 
 ]] --
 local init = {
-    interval = 0.005, -- run every 0.005s
-    script = "sensors.lua", -- run this script
-    msp = false, -- do not run if busy with msp 
-    no_link = false -- run this script always
+    interval        = 0.25,              -- run every 0.1 seconds
+    script          = "sensors.lua",   -- run this script
+    linkrequired    = true,            -- run this script only if link is established
+    spreadschedule  = true,            -- run on every loop
+    simulatoronly   = false,           -- run this script in simulation mode
 }
 
 return init

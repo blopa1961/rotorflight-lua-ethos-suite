@@ -1,5 +1,40 @@
 {
   "sensors": {
+    "attpitch": {
+      "english": "P.angle",
+      "translation": "Angle Prof.",
+      "needs_translation": "false"
+    },
+    "attroll": {
+      "english": "R.angle",
+      "translation": "Angle Roll",
+      "needs_translation": "false"
+    },
+    "attyaw": {
+      "english": "Y.angle",
+      "translation": "Angle Lacet",
+      "needs_translation": "false"
+    },
+    "accx": {
+      "english": "Accel X",
+      "translation": "Accel X",
+      "needs_translation": "false"
+    },
+    "accy": {
+      "english": "Accel Y",
+      "translation": "Accel Z",
+      "needs_translation": "false"
+    },
+    "accz": {
+      "english": "Accel Z",
+      "translation": "Accel Z",
+      "needs_translation": "false"
+    },
+    "groundspeed": {
+      "english": "Ground Speed",
+      "translation": "Vitesse Sol",
+      "needs_translation": "false"
+    },
     "esc_temp": {
       "english": "ESC Temperature",
       "translation": "Temperature ESC",
@@ -15,9 +50,24 @@
       "translation": "Tours Moteurs",
       "needs_translation": "false"
     },
+    "altitude": {
+      "english": "Altitude",
+      "translation": "Altitude",
+      "needs_translation": "false"
+    },
     "voltage": {
       "english": "Voltage",
       "translation": "Tension",
+      "needs_translation": "false"
+    },
+    "bec_voltage": {
+      "english": "Bec voltage",
+      "translation": "Tension BEC",
+      "needs_translation": "false"
+    },
+    "cell_count": {
+      "english": "Cell count",
+      "translation": "Nombre de cellules",
       "needs_translation": "false"
     },
     "governor": {
@@ -35,6 +85,11 @@
       "translation": "Niveau de Carburant",
       "needs_translation": "false"
     },
+    "smartfuel": {
+      "english": "Smart Fuel",
+      "translation": "Carburant intelligent",
+      "needs_translation": "false"
+    },
     "rssi": {
       "english": "RSSI",
       "translation": "Signal du Recepteur",
@@ -47,7 +102,7 @@
     },
     "arming_flags": {
       "english": "Arming Flags",
-      "translation": "Drapeaux Armements",
+      "translation": "Drapeaux Armement",
       "needs_translation": "false"
     },
     "current": {
@@ -77,7 +132,7 @@
     },
     "armdisableflags": {
       "english": "Arming Disable",
-      "translation": "Désactivation Armement",
+      "translation": "Desactivation Armement",
       "needs_translation": "false"
     }
   }

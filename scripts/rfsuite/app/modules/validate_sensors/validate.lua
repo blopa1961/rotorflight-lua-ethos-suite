@@ -1,6 +1,6 @@
 local fields = {}
 local labels = {}
-
+local i18n = rfsuite.i18n.get
 local enableWakeup = false
 
 local w, h = rfsuite.utils.getWindowSize()
@@ -19,7 +19,7 @@ local progressLoaderCounter = 0
 local doDiscoverNotify = false
 
 
-function sortSensorListByName(sensorList)
+local function sortSensorListByName(sensorList)
     table.sort(sensorList, function(a, b)
         return a.name:lower() < b.name:lower()
     end)
@@ -40,13 +40,13 @@ local function openPage(pidx, title, script)
 
     rfsuite.app.ui.fieldHeader(rfsuite.i18n.get("app.modules.validate_sensors.name"))
 
-    rfsuite.session.formLineCnt = 0
+    rfsuite.app.formLineCnt = 0
     local posText = {x = x - 5 - buttonW - buttonWs, y = rfsuite.app.radio.linePaddingTop, w = 200, h = rfsuite.app.radio.navbuttonHeight}
     for i, v in ipairs(sensorList) do
 
-        rfsuite.session.formLineCnt = rfsuite.session.formLineCnt + 1
-        rfsuite.app.formLines[rfsuite.session.formLineCnt] = form.addLine(v.name)
-        rfsuite.app.formFields[v.key] = form.addStaticText(rfsuite.app.formLines[rfsuite.session.formLineCnt], posText, "-")
+        rfsuite.app.formLineCnt = rfsuite.app.formLineCnt + 1
+        rfsuite.app.formLines[rfsuite.app.formLineCnt] = form.addLine(v.name)
+        rfsuite.app.formFields[v.key] = form.addStaticText(rfsuite.app.formLines[rfsuite.app.formLineCnt], posText, "-")
 
     end
 

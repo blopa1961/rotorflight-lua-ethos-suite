@@ -6,8 +6,9 @@ local mspSignature = ESC.mspSignature
 local simulatorResponse = ESC.simulatorResponse
 local activeFields = ESC.getActiveFields(rfsuite.session.escBuffer)
 local activateWakeup = false
+local i18n = rfsuite.i18n.get
 
-local mspapi = {
+local apidata = {
     api = {
         [1] = "ESC_PARAMETERS_XDFLY",
     },
@@ -15,24 +16,24 @@ local mspapi = {
         labels = {
         },
         fields = {
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.timing"),              activeFieldPos = 4,  mspapi = 1, type = 1, apikey = "timing"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.acceleration"),        activeFieldPos = 9,  mspapi = 1, type = 1, apikey = "acceleration"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.brake_force"),         activeFieldPos = 14, mspapi = 1, apikey = "brake_force"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.sr_function"),         activeFieldPos = 15, mspapi = 1, type = 1, apikey = "sr_function"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.capacity_correction"), activeFieldPos = 16, mspapi = 1, apikey = "capacity_correction"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.auto_restart_time"),   activeFieldPos = 10, mspapi = 1, type = 1, apikey = "auto_restart_time"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.cell_cutoff"),         activeFieldPos = 11, mspapi = 1, type = 1, apikey = "cell_cutoff"}
+            {t = i18n("app.modules.esc_tools.mfg.xdfly.timing"),              activeFieldPos = 4,  mspapi = 1, type = 1, apikey = "timing"},
+            {t = i18n("app.modules.esc_tools.mfg.xdfly.acceleration"),        activeFieldPos = 9,  mspapi = 1, type = 1, apikey = "acceleration"},
+            {t = i18n("app.modules.esc_tools.mfg.xdfly.brake_force"),         activeFieldPos = 14, mspapi = 1, apikey = "brake_force"},
+            {t = i18n("app.modules.esc_tools.mfg.xdfly.sr_function"),         activeFieldPos = 15, mspapi = 1, type = 1, apikey = "sr_function"},
+            {t = i18n("app.modules.esc_tools.mfg.xdfly.capacity_correction"), activeFieldPos = 16, mspapi = 1, apikey = "capacity_correction"},
+            {t = i18n("app.modules.esc_tools.mfg.xdfly.auto_restart_time"),   activeFieldPos = 10, mspapi = 1, type = 1, apikey = "auto_restart_time"},
+            {t = i18n("app.modules.esc_tools.mfg.xdfly.cell_cutoff"),         activeFieldPos = 11, mspapi = 1, type = 1, apikey = "cell_cutoff"}
         }
     }                 
 }
 
 -- This code will disable the field if the ESC does not support it
 -- It now uses the activeFieldsPos element to associate to the activeFields table
-for i = #mspapi.formdata.fields, 1, -1 do 
-    local f = mspapi.formdata.fields[i]
+for i = #apidata.formdata.fields, 1, -1 do 
+    local f = apidata.formdata.fields[i]
     local fieldIndex = f.activeFieldPos  -- Use activeFieldPos for association
     if activeFields[fieldIndex] == 0 then
-        table.remove(mspapi.formdata.fields, i)  -- Remove the field from the table
+        table.remove(apidata.formdata.fields, i)  -- Remove the field from the table
     end
 end
 
@@ -69,7 +70,7 @@ local function wakeup(self)
 end
 
 return {
-    mspapi=mspapi,
+    apidata = apidata,
     eepromWrite = true,
     reboot = false,
     escinfo = escinfo,
@@ -79,7 +80,7 @@ return {
     navButtons = {menu = true, save = true, reload = true, tool = false, help = false},
     onNavMenu = onNavMenu,
     event = event,
-    pageTitle = rfsuite.i18n.get("app.modules.esc_tools.name") .. " / " ..  rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.name") .. " / " .. rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.advanced"),
+    pageTitle = i18n("app.modules.esc_tools.name") .. " / " ..  i18n("app.modules.esc_tools.mfg.xdfly.name") .. " / " .. i18n("app.modules.esc_tools.mfg.xdfly.advanced"),
     headerLine = rfsuite.escHeaderLineText,
     wakeup = wakeup
 }

@@ -256,6 +256,11 @@
       "translation": "Disabilitato",
       "needs_translation": "false"
     },
+    "tbl_auto": {
+      "english": "Auto",
+      "translation": "Automatique",
+      "needs_translation": "false"
+    },
     "starting_torque": {
       "english": "Starting torque for the motor",
       "translation": "Coppia iniziale per il motore",
@@ -964,6 +969,13 @@
       "needs_translation": "false"
     }
   },
+  "PILOT_CONFIG": {
+    "model_param1_value": {
+      "english": "Set this to the expected flight time in seconds.  The transmitter will beep when the flight time is reached.",
+      "translation": "Reglez cette valeur sur la duree de vol prevue, en secondes. La radiocommande emettra un bip lorsque cette duree sera atteinte.",
+      "needs_translation": "false"
+    }
+  },
   "BATTERY_CONFIG": {
     "vbatmincellvoltage": {
       "english": "The minimum voltage per cell before the low voltage alarm is triggered.",
@@ -1328,7 +1340,7 @@
       "needs_translation": "false"
     },
     "tbl_yellow": {
-      "english": "YELOW",
+      "english": "YELLOW",
       "translation": "GIALLO",
       "needs_translation": "false"
     },

@@ -7,11 +7,12 @@ local mspSignature = ESC.mspSignature
 local simulatorResponse = ESC.simulatorResponse
 local activeFields = ESC.getActiveFields(rfsuite.session.escBuffer)
 local activateWakeup = false
+local i18n = rfsuite.i18n.get
 
 local foundEsc = false
 local foundEscDone = false
 
-local mspapi = {
+local apidata = {
     api = {
         [1] = "ESC_PARAMETERS_XDFLY",
     },
@@ -19,10 +20,10 @@ local mspapi = {
         labels = {
         },
         fields = {
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.gov"), activeFieldPos = 2, type = 1,  mspapi = 1, apikey = "governor"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.gov_p"), activeFieldPos = 6,  mspapi = 1, apikey="gov_p"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.gov_i"), activeFieldPos = 7,  mspapi = 1, apikey="gov_i"},
-            {t = rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.motor_poles"),  activeFieldPos = 17 ,  mspapi = 1, apikey="motor_poles"},
+            {t = i18n("app.modules.esc_tools.mfg.xdfly.gov"), activeFieldPos = 2, type = 1,  mspapi = 1, apikey = "governor"},
+            {t = i18n("app.modules.esc_tools.mfg.xdfly.gov_p"), activeFieldPos = 6,  mspapi = 1, apikey="gov_p"},
+            {t = i18n("app.modules.esc_tools.mfg.xdfly.gov_i"), activeFieldPos = 7,  mspapi = 1, apikey="gov_i"},
+            {t = i18n("app.modules.esc_tools.mfg.xdfly.motor_poles"),  activeFieldPos = 17 ,  mspapi = 1, apikey="motor_poles"},
         }
     }                 
 }
@@ -30,11 +31,11 @@ local mspapi = {
 
 -- This code will disable the field if the ESC does not support it
 -- It now uses the activeFieldsPos element to associate to the activeFields table
-for i = #mspapi.formdata.fields, 1, -1 do 
-    local f = mspapi.formdata.fields[i]
+for i = #apidata.formdata.fields, 1, -1 do 
+    local f = apidata.formdata.fields[i]
     local fieldIndex = f.activeFieldPos  -- Use activeFieldPos for association
     if activeFields[fieldIndex] == 0 then
-        table.remove(mspapi.formdata.fields, i)  -- Remove the field from the table
+        table.remove(apidata.formdata.fields, i)  -- Remove the field from the table
     end
 end
 
@@ -68,7 +69,7 @@ local function wakeup(self)
 end
 
 return {
-    mspapi=mspapi,
+    apidata = apidata,
     eepromWrite = true,
     reboot = false,
     escinfo = escinfo,
@@ -76,7 +77,7 @@ return {
     navButtons = {menu = true, save = true, reload = true, tool = false, help = false},
     onNavMenu = onNavMenu,
     event = event,
-    pageTitle = rfsuite.i18n.get("app.modules.esc_tools.name") .. " / " ..  rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.name") .. " / " .. rfsuite.i18n.get("app.modules.esc_tools.mfg.xdfly.governor"),
+    pageTitle = i18n("app.modules.esc_tools.name") .. " / " ..  i18n("app.modules.esc_tools.mfg.xdfly.name") .. " / " .. i18n("app.modules.esc_tools.mfg.xdfly.governor"),
     headerLine = rfsuite.escHeaderLineText,
     wakeup = wakeup
 }

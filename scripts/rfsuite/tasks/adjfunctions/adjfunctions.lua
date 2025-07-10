@@ -203,7 +203,25 @@ local adjFunctionsTable = {
 
     -- accelerometer
     id64 = {name = "Accelerometer Pitch Trim", wavs = {"acc", "pitch", "trim"}},
-    id65 = {name = "Accelerometer Roll Trim", wavs = {"acc", "roll", "trim"}}
+    id65 = {name = "Accelerometer Roll Trim", wavs = {"acc", "roll", "trim"}},
+
+    -- Yaw Inertia precomp
+    id66 = { name = "Yaw Inertia Precomp Gain", wavs = {"yaw","inertia","precomp","gain"}},
+    id67 = { name = "Yaw Inertia Precomp Cutoff", wavs = {"yaw","inertia","precomp","cutoff"}},
+
+    -- Setpoint boost
+    id68 = { name = "Pitch Setpoint Boost Gain", wavs = { "pitch", "setpoint", "boost", "gain" }},
+    id69 = { name = "Roll Setpoint Boost Gain", wavs = {"roll", "setpoint", "boost", "gain"}},
+    id70 = { name = "Yaw Setpoint Boost Gain", wavs = {"yaw", "setpoint", "boost", "gain"}},
+    id71 = { name = "Collective Setpoint Boost Gain", wavs = {"collective", "setpoint", "boost", "gain"}},
+
+    -- Yaw dynamic deadband
+    id72 = { name = "Yaw Dynamic Ceiling Gain", wavs = {"yaw", "dyn", "ceiling", "gain"} },
+    id73 = { name = "Yaw Dynamic Deadband Gain", wavs = {"yaw", "dyn", "deadband", "gain"} },
+    id74 = { name = "Yaw Dynamic Deadband Filter", wavs = {"yaw", "dyn", "deadband", "filter"} },
+
+    -- Precomp cutoff
+    id75 = { name = "Yaw Precomp Cutoff", wavs = {"yaw", "precomp", "cutoff"} },
 
 }
 
@@ -227,6 +245,7 @@ local adjfuncAdjTimer = os.clock()
 local adjfuncAdjfuncIdChanged = false
 local adjfuncAdjfuncValueChanged = false
 local adjfuncAdjJustUp = false
+local adjfuncAdjJustUpCounter
 
 --[[
     Function: adjfunc.wakeup
@@ -248,10 +267,10 @@ local adjfuncAdjJustUp = false
     - adjfuncAdjFunctionSrc: Source for adjFunction sensor.
     - adjfuncAdjValueSrc: Source for adjValue sensor.
     - adjfuncAdjValue: Current value of adjValue sensor.
-    - adjfunc.adjFunction: Current value of adjFunction sensor.
+    - adjfuncAdjFunction: Current value of adjFunction sensor.
     - adjfuncAdjValueOld: Previous value of adjValue sensor.
     - adjfuncAdjFunctionOld: Previous value of adjFunction sensor.
-    - adjfunc.adjfuncIdChanged: Flag indicating if adjFunction has changed.
+    - adjfuncAdjfuncIdChanged: Flag indicating if adjFunction has changed.
     - adjfuncAdjfuncValueChanged: Flag indicating if adjValue has changed.
     - adjfuncAdjJustUp: Flag indicating if adjFunction was just activated.
     - adjfuncAdjJustUpCounter: Counter for adjJustUp state.
@@ -261,22 +280,18 @@ local adjfuncAdjJustUp = false
 function adjfunc.wakeup()
 
     -- do not run the remaining code
-    if rfsuite.preferences.adjFunctionAlerts == false and rfsuite.preferences.adjValueAlerts == false then return end
-
+    if rfsuite.preferences.events.adj_f == false and rfsuite.preferences.events.adj_v == false then return end
 
     if (os.clock() - initTime) < 5  then return end
 
     -- getSensor source has a cache built in - win
-    adjfuncAdjFunctionSrc = rfsuite.tasks.telemetry.getSensorSource("adj_f")
-    adjfuncAdjValueSrc = rfsuite.tasks.telemetry.getSensorSource("adj_v")
+    adjfuncAdjValue = rfsuite.tasks.telemetry.getSensor("adj_v")
+    adjfuncAdjFunction = rfsuite.tasks.telemetry.getSensor("adj_f")
 
-    if adjfuncAdjValueSrc ~= nil and adjfuncAdjFunctionSrc ~= nil then
-
-        adjfuncAdjValue = adjfuncAdjValueSrc:value()
-        adjfuncAdjFunction = adjfuncAdjFunctionSrc:value()
+    if adjfuncAdjValue ~= nil and adjfuncAdjFunction ~= nil then
 
         if adjfuncAdjValue ~= nil then if type(adjfuncAdjValue) == "number" then adjfuncAdjValue = math.floor(adjfuncAdjValue) end end
-        if adjfuncAdjFunction ~= nil then if type(adjfunc.adjFunction) == "number" then adjfuncAdjFunction = math.floor(adjfunc.adjFunction) end end
+        if adjfuncAdjFunction ~= nil then if type(adjfuncAdjFunction) == "number" then adjfuncAdjFunction = math.floor(adjfuncAdjFunction) end end
 
         if adjfuncAdjFunction ~= adjfuncAdjFunctionOld then adjfuncAdjfuncIdChanged = true end
         if adjfuncAdjValue ~= adjfuncAdjValueOld then adjfuncAdjfuncValueChanged = true end
@@ -292,16 +307,24 @@ function adjfunc.wakeup()
             if adjfuncAdjFunction ~= 0 then
                 adjfuncAdjJustUpCounter = 0
                 if (os.clock() - adjfuncAdjTimer >= 2) then
+
                     if adjfuncAdjfuncIdChanged == true then
 
-                        local tgt = "id" .. tostring(adjfunc.adjFunction)
+                        local tgt = "id" .. tostring(adjfuncAdjFunction)
+         
                         local adjfunction = adjFunctionsTable[tgt]
-                        if adjfunction ~= nil and firstRun == false then for wavi, wavv in ipairs(adjfunction.wavs) do if rfsuite.preferences.adjFunctionAlerts == true then rfsuite.utils.playFile("adjfunctions", wavv .. ".wav") end end end
+                        if adjfunction ~= nil and firstRun == false then 
+                            for wavi, wavv in ipairs(adjfunction.wavs) do 
+                                if rfsuite.preferences.events.adj_f == true then 
+                                    rfsuite.utils.playFile("adjfunctions", wavv .. ".wav") 
+                                end 
+                            end 
+                        end
                         adjfuncAdjfuncIdChanged = false
                     end
                     if adjfuncAdjfuncValueChanged == true or adjfuncAdjfuncIdChanged == true then
 
-                        if adjfuncAdjValue ~= nil and firstRun == false then if rfsuite.preferences.adjValueAlerts == true then system.playNumber(adjfuncAdjValue) end end
+                        if adjfuncAdjValue ~= nil and firstRun == false then if rfsuite.preferences.events.adj_v == true then system.playNumber(adjfuncAdjValue) end end
 
                         adjfuncAdjfuncValueChanged = false
 
@@ -313,7 +336,7 @@ function adjfunc.wakeup()
         end
 
         adjfuncAdjValueOld = adjfuncAdjValue
-        adjfuncAdjFunctionOld = adjfunc.adjFunction
+        adjfuncAdjFunctionOld = adjfuncAdjFunction
 
     end
 end

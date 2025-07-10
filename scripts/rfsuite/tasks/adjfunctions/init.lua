@@ -17,9 +17,12 @@
  * 
 ]] --
 local init = {
-    interval = 0.5, -- run every 0.5s
-    script = "adjfunctions.lua", -- run this script
-    msp = false -- do not run if busy with msp
+    interval        = 0.5,                  -- run every 0.5 seconds
+    script          = "adjfunctions.lua",   -- run this script
+    linkrequired    = true,                 -- run this script only if link is established
+    spreadschedule  = true,                 -- run on every loop   
+    simulatoronly   = false,                -- run this script in simulation mode 
 }
+
 
 return init

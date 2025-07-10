@@ -3,12 +3,12 @@ local activateWakeup = false
 local extraMsgOnSave = nil
 local resetRates = false
 local doFullReload = false
-
+local i18n = rfsuite.i18n.get
 if rfsuite.session.activeRateTable == nil then 
-    rfsuite.session.activeRateTable = rfsuite.preferences.defaultRateProfile 
+    rfsuite.session.activeRateTable = rfsuite.config.defaultRateProfile 
 end
 
-local mspapi = {
+local apidata = {
     api = {
         [1] = 'RC_TUNING',
     },
@@ -16,14 +16,14 @@ local mspapi = {
         labels = {
         },
         fields = {
-            {t = rfsuite.i18n.get("app.modules.rates_advanced.rate_table"),        mspapi = 1, apikey = "rates_type", type = 1, ratetype = 1, postEdit = function(self) self.flagRateChange(self, true) end},
+            {t = i18n("app.modules.rates_advanced.rate_table"),        mspapi = 1, apikey = "rates_type", type = 1, ratetype = 1, postEdit = function(self) self.flagRateChange(self, true) end},
         }
     }                 
 }
 
 local function preSave(self)
     if resetRates == true then
-        rfsuite.utils.log("Resetting rates to defaults","info")
+        --rfsuite.utils.log("Resetting rates to defaults","info")
 
         -- selected id
         local table_id = rfsuite.app.Page.fields[1].value
@@ -87,9 +87,9 @@ end
 
 local function postLoad(self)
 
-    local v = mspapi.values[mspapi.api[1]].rates_type
+    local v = apidata.values[apidata.api[1]].rates_type
     
-    rfsuite.utils.log("Active Rate Table: " .. rfsuite.session.activeRateTable,"info")
+    rfsuite.utils.log("Active Rate Table: " .. rfsuite.session.activeRateTable,"debug")
 
     if v ~= rfsuite.session.activeRateTable then
         rfsuite.utils.log("Switching Rate Table: " .. v,"info")
@@ -128,7 +128,7 @@ local function flagRateChange(self)
         rfsuite.app.ui.enableAllFields()
         resetRates = false
     else
-        self.extraMsgOnSave = rfsuite.i18n.get("app.modules.rates_advanced.msg_reset_to_defaults")
+        self.extraMsgOnSave = i18n("app.modules.rates_advanced.msg_reset_to_defaults")
         resetRates = true
         rfsuite.app.ui.disableAllFields()
         rfsuite.app.formFields[1]:enable(true)
@@ -144,8 +144,8 @@ local function postEepromWrite(self)
 end
 
 return {
-    mspapi = mspapi,
-    title = rfsuite.i18n.get("app.modules.rates_advanced.rates_type"),
+    apidata = apidata,
+    title = i18n("app.modules.rates_advanced.rates_type"),
     reboot = false,
     eepromWrite = true,
     refreshOnRateChange = true,

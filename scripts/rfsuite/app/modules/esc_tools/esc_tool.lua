@@ -15,6 +15,8 @@ local powercycleLoaderCounter = 0
 local powercycleLoaderRateLimit = 2
 local showPowerCycleLoaderFinished = false
 
+local i18n = rfsuite.i18n.get
+
 local modelField
 local versionField
 local firmwareField
@@ -24,7 +26,7 @@ local findTimeout = math.floor(rfsuite.tasks.msp.protocol.pageReqTimeout * 0.5)
 
 local modelLine
 local modelText
-local modelTextPos = {x = 0, y = rfsuite.app.radio.linePaddingTop, w = rfsuite.session.lcdWidth, h = rfsuite.app.radio.navbuttonHeight}
+local modelTextPos = {x = 0, y = rfsuite.app.radio.linePaddingTop, w = rfsuite.app.lcdWidth, h = rfsuite.app.radio.navbuttonHeight}
 
 local function getESCDetails()
 
@@ -104,33 +106,33 @@ local function openPage(pidx, title, script)
     rfsuite.app.formLines = {}
 
 
-    local windowWidth = rfsuite.session.lcdWidth
-    local windowHeight = rfsuite.session.lcdHeight
+    local windowWidth = rfsuite.app.lcdWidth
+    local windowHeight = rfsuite.app.lcdHeight
 
     local y = rfsuite.app.radio.linePaddingTop
 
     form.clear()
 
-    line = form.addLine(rfsuite.i18n.get("app.modules.esc_tools.name") .. ' / ' .. ESC.toolName)
+    line = form.addLine(i18n("app.modules.esc_tools.name") .. ' / ' .. ESC.toolName)
 
     buttonW = 100
     local x = windowWidth - buttonW
 
     rfsuite.app.formNavigationFields['menu'] = form.addButton(line, {x = x - buttonW - 5, y = rfsuite.app.radio.linePaddingTop, w = buttonW, h = rfsuite.app.radio.navbuttonHeight}, {
-        text = rfsuite.i18n.get("app.navigation_menu"),
+        text = i18n("app.navigation_menu"),
         icon = nil,
         options = FONT_S,
         paint = function()
         end,
         press = function()
-            rfsuite.app.ui.openPage(pidx, rfsuite.i18n.get("app.modules.esc_tools.name"), "esc_tools/esc.lua")
+            rfsuite.app.ui.openPage(pidx, i18n("app.modules.esc_tools.name"), "esc_tools/esc.lua")
 
         end
     })
     rfsuite.app.formNavigationFields['menu']:focus()
 
     rfsuite.app.formNavigationFields['refresh'] = form.addButton(line, {x = x, y = rfsuite.app.radio.linePaddingTop, w = buttonW, h = rfsuite.app.radio.navbuttonHeight}, {
-        text = rfsuite.i18n.get("app.navigation_reload"),
+        text = i18n("app.navigation_reload"),
         icon = nil,
         options = FONT_S,
         paint = function()
@@ -156,21 +158,21 @@ local function openPage(pidx, title, script)
     local padding
     local numPerRow
 
-    if rfsuite.preferences.iconSize == nil or rfsuite.preferences.iconSize == "" then
-        rfsuite.preferences.iconSize = 1
+    if rfsuite.preferences.general.iconsize == nil or rfsuite.preferences.general.iconsize == "" then
+        rfsuite.preferences.general.iconsize = 1
     else
-        rfsuite.preferences.iconSize = tonumber(rfsuite.preferences.iconSize)
+        rfsuite.preferences.general.iconsize = tonumber(rfsuite.preferences.general.iconsize)
     end
 
     -- TEXT ICONS
-    if rfsuite.preferences.iconSize == 0 then
+    if rfsuite.preferences.general.iconsize == 0 then
         padding = rfsuite.app.radio.buttonPaddingSmall
-        buttonW = (rfsuite.session.lcdWidth - padding) / rfsuite.app.radio.buttonsPerRow - padding
+        buttonW = (rfsuite.app.lcdWidth - padding) / rfsuite.app.radio.buttonsPerRow - padding
         buttonH = rfsuite.app.radio.navbuttonHeight
         numPerRow = rfsuite.app.radio.buttonsPerRow
     end
     -- SMALL ICONS
-    if rfsuite.preferences.iconSize == 1 then
+    if rfsuite.preferences.general.iconsize == 1 then
 
         padding = rfsuite.app.radio.buttonPaddingSmall
         buttonW = rfsuite.app.radio.buttonWidthSmall
@@ -178,7 +180,7 @@ local function openPage(pidx, title, script)
         numPerRow = rfsuite.app.radio.buttonsPerRowSmall
     end
     -- LARGE ICONS
-    if rfsuite.preferences.iconSize == 2 then
+    if rfsuite.preferences.general.iconsize == 2 then
 
         padding = rfsuite.app.radio.buttonPadding
         buttonW = rfsuite.app.radio.buttonWidth
@@ -190,7 +192,7 @@ local function openPage(pidx, title, script)
     local bx = 0
 
     if rfsuite.app.gfx_buttons["esctool"] == nil then rfsuite.app.gfx_buttons["esctool"] = {} end
-    if rfsuite.app.menuLastSelected["esctool"] == nil then rfsuite.app.menuLastSelected["esctool"] = 1 end
+    if rfsuite.preferences.menulastselected["esctool"] == nil then rfsuite.preferences.menulastselected["esctool"] = 1 end
 
     for pidx, pvalue in ipairs(ESC.pages) do 
 
@@ -199,19 +201,19 @@ local function openPage(pidx, title, script)
         local hideSection = (section.ethosversion and rfsuite.session.ethosRunningVersion < section.ethosversion) or
                             (section.mspversion and (rfsuite.session.apiVersion or 1) < section.mspversion) 
                             --or
-                            --(section.developer and not rfsuite.config.developerMode)
+                            --(section.developer and not rfsuite.preferences.developer.devtools)
 
         if not pvalue.disablebutton or (pvalue and pvalue.disablebutton(mspBytes) == false) or not hideSection then
 
             if lc == 0 then
-                if rfsuite.preferences.iconSize == 0 then y = form.height() + rfsuite.app.radio.buttonPaddingSmall end
-                if rfsuite.preferences.iconSize == 1 then y = form.height() + rfsuite.app.radio.buttonPaddingSmall end
-                if rfsuite.preferences.iconSize == 2 then y = form.height() + rfsuite.app.radio.buttonPadding end
+                if rfsuite.preferences.general.iconsize == 0 then y = form.height() + rfsuite.app.radio.buttonPaddingSmall end
+                if rfsuite.preferences.general.iconsize == 1 then y = form.height() + rfsuite.app.radio.buttonPaddingSmall end
+                if rfsuite.preferences.general.iconsize == 2 then y = form.height() + rfsuite.app.radio.buttonPadding end
             end
 
             if lc >= 0 then bx = (buttonW + padding) * lc end
 
-            if rfsuite.preferences.iconSize ~= 0 then
+            if rfsuite.preferences.general.iconsize ~= 0 then
                 if rfsuite.app.gfx_buttons["esctool"][pvalue.image] == nil then rfsuite.app.gfx_buttons["esctool"][pvalue.image] = lcd.loadMask("app/modules/esc_tools/mfg/" .. folder .. "/gfx/" .. pvalue.image) end
             else
                 rfsuite.app.gfx_buttons["esctool"][pvalue.image] = nil
@@ -224,7 +226,7 @@ local function openPage(pidx, title, script)
                 paint = function()
                 end,
                 press = function()
-                    rfsuite.app.menuLastSelected["esctool"] = pidx
+                    rfsuite.preferences.menulastselected["esctool"] = pidx
                     rfsuite.app.ui.progressDisplay()
 
                     rfsuite.app.ui.openPage(pidx, title, "esc_tools/mfg/" .. folder .. "/pages/" .. pvalue.script)
@@ -232,7 +234,7 @@ local function openPage(pidx, title, script)
                 end
             })
 
-            if rfsuite.app.menuLastSelected["esctool"] == pidx then rfsuite.app.formFields[pidx]:focus() end
+            if rfsuite.preferences.menulastselected["esctool"] == pidx then rfsuite.app.formFields[pidx]:focus() end
 
             if rfsuite.app.triggers.escToolEnableButtons == true then
                 rfsuite.app.formFields[pidx]:enable(true)
@@ -286,7 +288,7 @@ local function wakeup()
         rfsuite.app.dialogs.progressDisplay = false
         rfsuite.app.triggers.isReady = true
 
-        if ESC and ESC.powerCycle ~= true then modelText = form.addStaticText(modelLine, modelTextPos, rfsuite.i18n.get("app.modules.esc_tools.unknown")) end
+        if ESC and ESC.powerCycle ~= true then modelText = form.addStaticText(modelLine, modelTextPos, i18n("app.modules.esc_tools.unknown")) end
 
         if ESC and ESC.powerCycle == true then showPowerCycleLoader = true end
 
@@ -305,7 +307,7 @@ local function wakeup()
 
             if powercycleLoaderCounter >= 100 then
                 powercycleLoader:close()
-                modelText = form.addStaticText(modelLine, modelTextPos, rfsuite.i18n.get("app.modules.esc_tools.unknown"))
+                modelText = form.addStaticText(modelLine, modelTextPos, i18n("app.modules.esc_tools.unknown"))
                 showPowerCycleLoaderInProgress = false
                 rfsuite.app.triggers.disableRssiTimeout = false
                 showPowerCycleLoader = false
@@ -323,7 +325,7 @@ local function wakeup()
             showPowerCycleLoaderInProgress = true
             rfsuite.app.audio.playEscPowerCycle = true
             rfsuite.app.triggers.disableRssiTimeout = true
-            powercycleLoader = form.openProgressDialog(rfsuite.i18n.get("app.modules.esc_tools.searching"), rfsuite.i18n.get("app.modules.esc_tools.please_powercycle"))
+            powercycleLoader = form.openProgressDialog(i18n("app.modules.esc_tools.searching"), i18n("app.modules.esc_tools.please_powercycle"))
             powercycleLoader:value(0)
             powercycleLoader:closeAllowed(false)
         end
@@ -336,7 +338,7 @@ local function event(widget, category, value, x, y)
     -- if close event detected go to section home page
     if category == EVT_CLOSE and value == 0 or value == 35 then
         if powercycleLoader then powercycleLoader:close() end
-        rfsuite.app.ui.openPage(pidx, rfsuite.i18n.get("app.modules.esc_tools.name"), "esc_tools/esc.lua")
+        rfsuite.app.ui.openPage(pidx, i18n("app.modules.esc_tools.name"), "esc_tools/esc.lua")
         return true
     end
 

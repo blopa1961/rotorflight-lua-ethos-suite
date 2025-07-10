@@ -1,5 +1,40 @@
 {
   "sensors": {
+    "attpitch": {
+      "english": "P.angle",
+      "translation": "Angulo P.",
+      "needs_translation": "false"
+    },
+    "attroll": {
+      "english": "R.angle",
+      "translation": "Angulo R.",
+      "needs_translation": "false"
+    },
+    "attyaw": {
+      "english": "Y.angle",
+      "translation": "Angulo Y.",
+      "needs_translation": "false"
+    },
+    "accx": {
+      "english": "Accel X",
+      "translation": "Acel. X",
+      "needs_translation": "false"
+    },
+    "accy": {
+      "english": "Accel Y",
+      "translation": "Acel. Y",
+      "needs_translation": "false"
+    },
+    "accz": {
+      "english": "Accel Z",
+      "translation": "Acel. Z",
+      "needs_translation": "false"
+    },
+    "groundspeed": {
+      "english": "Ground Speed",
+      "translation": "Velocidad Avance",
+      "needs_translation": "false"
+    },
     "esc_temp": {
       "english": "ESC Temperature",
       "translation": "Temperatura ESC",
@@ -15,9 +50,24 @@
       "translation": "Veloc. Rotor",
       "needs_translation": "false"
     },
+    "altitude": {
+      "english": "Altitude",
+      "translation": "Altitud",
+      "needs_translation": "false"
+    },
     "voltage": {
       "english": "Voltage",
       "translation": "Voltaje",
+      "needs_translation": "false"
+    },
+    "bec_voltage": {
+      "english": "Bec voltage",
+      "translation": "Voltaje BEC",
+      "needs_translation": "false"
+    },
+    "cell_count": {
+      "english": "Cell count",
+      "translation": "Nro de Celdas",
       "needs_translation": "false"
     },
     "governor": {
@@ -34,6 +84,11 @@
       "english": "Charge Level",
       "translation": "Nivel de Carga",
       "needs_translation": "false"
+    },
+    "smartfuel": {
+      "english": "Smart Fuel",
+      "translation": "Smart Fuel",
+      "needs_translation": "true"
     },
     "rssi": {
       "english": "RSSI",

@@ -19,18 +19,39 @@
  * 
 
 ]] --
+local compiler = rfsuite.compiler
+
 local apiLoader = {}
+
+-- Cache table for file existence
+apiLoader._fileExistsCache = apiLoader._fileExistsCache or {}
 
 -- Define the API directory path based on the ethos version
 local apidir = "SCRIPTS:/".. rfsuite.config.baseDir  .. "/tasks/msp/api/"
 local api_path = apidir
 
+-- track if this is the first load of the API
+local firstLoadAPI = true
+
+-- holders populated on first load
+local mspHelper 
+local utils 
+local callback
+
+-- helper: check & cache file existence
+local function cached_file_exists(path)
+  if apiLoader._fileExistsCache[path] == nil then
+    apiLoader._fileExistsCache[path] = utils.file_exists(path)
+  end
+  return apiLoader._fileExistsCache[path]
+end
+
 -- New version using the global callback system
 function apiLoader.scheduleWakeup(func)
-    if rfsuite and rfsuite.tasks and  rfsuite.tasks.callback and rfsuite.tasks.callback.now then
-        rfsuite.tasks.callback.now(func)
+    if callback and callback.now then
+        callback.now(func)
     else
-        rfsuite.utils.log("ERROR: rfsuite.tasks.callback.now() is missing!", "info")
+        utils.log("ERROR: callback.now() is missing!", "info")
     end
 end
 
@@ -44,7 +65,7 @@ end
 
     The function performs the following steps:
     1. Constructs the file path for the API module.
-    2. Checks if the file exists using `rfsuite.utils.file_exists`.
+    2. Checks if the file exists using `utils.file_exists`.
     3. Loads the API module using `dofile`.
     4. Verifies that the module is a table and contains either a `read` or `write` function.
     5. Stores the API name inside the module as `__apiName`.
@@ -57,9 +78,17 @@ local function loadAPI(apiName)
 
     local apiFilePath = api_path .. apiName .. ".lua"
 
-    -- Check if file exists before trying to load it
-    if rfsuite.utils.file_exists(apiFilePath) then
-        local apiModule = dofile(apiFilePath) -- Load the Lua API file
+    if firstLoadAPI then
+        mspHelper = rfsuite.tasks.msp.mspHelper
+        utils = rfsuite.utils
+        callback = rfsuite.tasks.callback
+        firstLoadAPI = false
+    end    
+
+
+    -- Check if file exists before trying to load it (cached)
+    if cached_file_exists(apiFilePath) then
+        local apiModule = compiler.dofile(apiFilePath) -- Load the Lua API file
 
         if type(apiModule) == "table" and (apiModule.read or apiModule.write) then
 
@@ -98,17 +127,20 @@ local function loadAPI(apiName)
                 end
             end
 
-            rfsuite.utils.log("Loaded API: " .. apiName, "debug")
+            utils.log("Loaded API: " .. apiName, "debug")
             return apiModule
         else
-            rfsuite.utils.log("Error: API file '" .. apiName .. "' does not contain valid read or write functions.", "debug")
+            utils.log("Error: API file '" .. apiName .. "' does not contain valid read or write functions.", "debug")
         end
     else
-        rfsuite.utils.log("Error: API file '" .. apiFilePath .. "' not found.", "debug")
+        utils.log("Error: API file '" .. apiFilePath .. "' not found.", "debug")
     end
 end
 
-
+-- clear the file-exists cache (call after adding/removing API files)
+function apiLoader.clearFileExistsCache()
+  apiLoader._fileExistsCache = {}
+end
 
 --[[
     Loads the specified API by name.
@@ -119,7 +151,7 @@ end
 function apiLoader.load(apiName)
     local api = loadAPI(apiName)
     if api == nil then
-        rfsuite.utils.log("Unable to load " .. apiName,"debug")
+        utils.log("Unable to load " .. apiName,"debug")
     end
     return api
 end
@@ -195,9 +227,9 @@ local function parseMSPChunk(buf, structure, state)
             goto continue
         end
 
-        local readFunction = rfsuite.tasks.msp.mspHelper["read" .. field.type]
+        local readFunction = mspHelper["read" .. field.type]
         if not readFunction then
-            rfsuite.utils.log("Error: No reader for type: " .. field.type, "debug")
+            utils.log("Error: No reader for type: " .. field.type, "debug")
             state.error = "Unknown type: " .. field.type
             return false
         end
@@ -209,7 +241,7 @@ local function parseMSPChunk(buf, structure, state)
         ::continue::
     end
 
-    rfsuite.utils.log(string.format("Chunk processed - fields %d to %d", startIndex, state.index - 1), "debug")
+    utils.log(string.format("Chunk processed - fields %d to %d", startIndex, state.index - 1), "debug")
 
     return state.index > #structure
 end
@@ -265,9 +297,9 @@ function apiLoader.parseMSPData(buf, structure, processed, other, options)
                     goto continue
                 end
 
-                local readFunction = rfsuite.tasks.msp.mspHelper["read" .. field.type]
+                local readFunction = mspHelper["read" .. field.type]
                 if not readFunction then
-                    rfsuite.utils.log("Error: No reader for type: " .. field.type, "debug")
+                    utils.log("Error: No reader for type: " .. field.type, "debug")
                     return
                 end
 
@@ -288,7 +320,7 @@ function apiLoader.parseMSPData(buf, structure, processed, other, options)
                 ::continue::
             end
 
-            rfsuite.utils.log(string.format("Chunk processed - fields %d to %d", 
+            utils.log(string.format("Chunk processed - fields %d to %d", 
                 state.index - processedFields, state.index - 1), "debug")
 
             if state.index > #structure then
@@ -303,7 +335,7 @@ function apiLoader.parseMSPData(buf, structure, processed, other, options)
                         receivedBytesCount = math.floor(buf.offset - 1)
                     })
                 else
-                    rfsuite.utils.log("Completion callback not provided or buffer offset not available", "info")
+                    utils.log("Completion callback not provided or buffer offset not available", "info")
                     completionCallback({
                         parsed = {state.parsedData},
                         buffer = {},
@@ -336,9 +368,9 @@ function apiLoader.parseMSPData(buf, structure, processed, other, options)
                 goto continue
             end
 
-            local readFunction = rfsuite.tasks.msp.mspHelper["read" .. field.type]
+            local readFunction = mspHelper["read" .. field.type]
             if not readFunction then
-                rfsuite.utils.log("Error: No reader for type: " .. field.type, "debug")
+                utils.log("Error: No reader for type: " .. field.type, "debug")
                 return nil
             end
 
@@ -361,9 +393,9 @@ function apiLoader.parseMSPData(buf, structure, processed, other, options)
 
         if buf.offset <= #buf then
             local extraBytes = #buf - (buf.offset - 1)
-            rfsuite.utils.log("Unused bytes in buffer (" .. extraBytes .. " extra bytes)", "debug")
+            utils.log("Unused bytes in buffer (" .. extraBytes .. " extra bytes)", "debug")
         elseif buf.offset > #buf + 1 then
-            rfsuite.utils.log("Offset exceeded buffer length (Offset: " .. buf.offset .. ", Buffer: " .. #buf .. ")", "debug")
+            utils.log("Offset exceeded buffer length (Offset: " .. buf.offset .. ", Buffer: " .. #buf .. ")", "debug")
         end
 
         return {
@@ -431,7 +463,7 @@ function apiLoader.filterByApiVersion(structure)
         local insert_param = false
 
         -- API version check logic
-        if not param.apiVersion or (apiVersion and rfsuite.utils.round(apiVersion,2) >= rfsuite.utils.round(param.apiVersion,2)) then
+        if not param.apiVersion or (apiVersion and utils.round(apiVersion,2) >= utils.round(param.apiVersion,2)) then
             insert_param = true
         end
 
@@ -551,13 +583,13 @@ end
 --]]
 function apiLoader.buildWritePayload(apiname, payload, api_structure, noDelta)
     if not rfsuite.app.Page then
-        rfsuite.utils.log("[buildWritePayload] No page context available", "info")
+        utils.log("[buildWritePayload] No page context available", "info")
         return nil
     end
 
-    local positionmap = rfsuite.app.Page.mspapi and rfsuite.app.Page.mspapi.positionmap[apiname]
-    local receivedBytes = rfsuite.app.Page.mspapi and rfsuite.app.Page.mspapi.receivedBytes[apiname]
-    local receivedBytesCount = rfsuite.app.Page.mspapi and rfsuite.app.Page.mspapi.receivedBytesCount[apiname]
+    local positionmap = rfsuite.app.Page.apidata and rfsuite.app.Page.apidata.positionmap[apiname]
+    local receivedBytes = rfsuite.app.Page.apidata and rfsuite.app.Page.apidata.receivedBytes[apiname]
+    local receivedBytesCount = rfsuite.app.Page.apidata and rfsuite.app.Page.apidata.receivedBytesCount[apiname]
 
     local useDelta = positionmap and receivedBytes and receivedBytesCount
 
@@ -567,10 +599,10 @@ function apiLoader.buildWritePayload(apiname, payload, api_structure, noDelta)
     end
 
     if useDelta then
-        rfsuite.utils.log("[buildWritePayload] Using delta updates for " .. apiname, "info")
+        utils.log("[buildWritePayload] Using delta updates for " .. apiname, "info")
         return apiLoader.buildDeltaPayload(apiname, payload, api_structure, positionmap, receivedBytes, receivedBytesCount)
     else
-        rfsuite.utils.log("[buildWritePayload] Using full rebuild for " .. apiname, "info")
+        utils.log("[buildWritePayload] Using full rebuild for " .. apiname, "info")
         return apiLoader.buildFullPayload(apiname, payload, api_structure)
     end
 end
@@ -617,8 +649,8 @@ function apiLoader.buildDeltaPayload(apiname, payload, api_structure, positionma
 
     -- Extract parameters from actual.lua
     local actual_fields = {}
-    if rfsuite.app.Page and rfsuite.app.Page.mspapi then
-        for _, field in ipairs(rfsuite.app.Page.mspapi.formdata.fields) do
+    if rfsuite.app.Page and rfsuite.app.Page.apidata then
+        for _, field in ipairs(rfsuite.app.Page.apidata.formdata.fields) do
             if actual_fields[field.apikey] then -- we check this because its possible a field may not be there is mspgt or msplt is used on page.
                 actual_fields[field.apikey] = field
             end
@@ -630,7 +662,7 @@ function apiLoader.buildDeltaPayload(apiname, payload, api_structure, positionma
     for _, field_def in ipairs(api_structure) do
         local field_name = field_def.field
         if not editableFields[field_name] then
-            rfsuite.utils.log("[buildDeltaPayload] Skipping non-editable field: " .. field_name, "debug")
+            utils.log("[buildDeltaPayload] Skipping non-editable field: " .. field_name, "debug")
             goto continue
         end
 
@@ -650,7 +682,7 @@ function apiLoader.buildDeltaPayload(apiname, payload, api_structure, positionma
         value = math.floor(value * scale + 0.5)
 
         -- Determine write function
-        local writeFunction = rfsuite.tasks.msp.mspHelper["write" .. field_def.type]
+        local writeFunction = mspHelper["write" .. field_def.type]
         if not writeFunction then
             error("Unknown type: " .. tostring(field_def.type))
         end
@@ -672,7 +704,7 @@ function apiLoader.buildDeltaPayload(apiname, payload, api_structure, positionma
                 end
             end
 
-            rfsuite.utils.log(string.format(
+            utils.log(string.format(
                 "[buildDeltaPayload] Patched field '%s' into positions [%s]",
                 field_name, table.concat(field_positions, ",")
             ), "debug")
@@ -708,12 +740,12 @@ end
 function apiLoader.buildFullPayload(apiname, payload, api_structure)
     local byte_stream = {}
 
-    rfsuite.utils.log("[buildFullPayload] Clearing byte stream for full rebuild", "debug")
+    utils.log("[buildFullPayload] Clearing byte stream for full rebuild", "debug")
 
     -- Extract parameters from actual.lua
     local actual_fields = {}
-    if rfsuite.app.Page and rfsuite.app.Page.mspapi then
-        for _, field in ipairs(rfsuite.app.Page.mspapi.formdata.fields) do
+    if rfsuite.app.Page and rfsuite.app.Page.apidata then
+        for _, field in ipairs(rfsuite.app.Page.apidata.formdata.fields) do
             actual_fields[field.apikey] = field
         end
     end
@@ -743,7 +775,7 @@ function apiLoader.buildFullPayload(apiname, payload, api_structure)
         value = math.floor(value * scale + 0.5)
 
         -- Determine write function
-        local writeFunction = rfsuite.tasks.msp.mspHelper["write" .. field_def.type]
+        local writeFunction = mspHelper["write" .. field_def.type]
         if not writeFunction then
             error("Unknown type: " .. tostring(field_def.type))
         end
@@ -760,7 +792,7 @@ function apiLoader.buildFullPayload(apiname, payload, api_structure)
             table.insert(byte_stream, byte)
         end
 
-        rfsuite.utils.log(string.format(
+        utils.log(string.format(
             "[buildFullPayload] Full write for field '%s' with value %d",
             field_name, value
         ), "debug")
