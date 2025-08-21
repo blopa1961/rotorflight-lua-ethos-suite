@@ -238,9 +238,34 @@
         "translation": "Log MSP queue size",
         "needs_translation": "false"
       },
+      "txt_taskprofiler": {
+        "english": "Log tasks speed",
+        "translation": "Log tasks speed",
+        "needs_translation": "false"
+      },
       "txt_memusage": {
         "english": "Log memory usage",
         "translation": "Log memory usage",
+        "needs_translation": "false"
+      },
+      "txt_batttype": {
+        "english": "Tx Battery Options",
+        "translation": "Tx Battery Options",
+        "needs_translation": "false"
+      },
+      "txt_battdef": {
+        "english": "Default",
+        "translation": "Default",
+        "needs_translation": "false"
+      },
+      "txt_batttext": {
+        "english": "Text",
+        "translation": "Text",
+        "needs_translation": "false"
+      },
+      "txt_battdig": {
+        "english": "Digital",
+        "translation": "Digital",
         "needs_translation": "false"
       },
       "dashboard": {
@@ -476,6 +501,21 @@
       "timer_postalert_interval": {
         "english": "Alert Interval",
         "translation": "Alert Interval",
+        "needs_translation": "false"
+      },
+      "adj_callouts": {
+        "english": "Adjustment Callouts",
+        "translation": "Adjustment Callouts",
+        "needs_translation": "false"
+      },
+      "adj_function": {
+        "english": "Adjustment Function",
+        "translation": "Adjustment Function",
+        "needs_translation": "false"
+      },
+      "adj_value": {
+        "english": "Adjustment Value",
+        "translation": "Adjustment Value",
         "needs_translation": "false"
       }
     },
@@ -789,6 +829,113 @@
             "needs_translation": "false"
           }
         },
+        "omp": {
+          "hv_bec_voltage": {
+            "english": "HV BEC Voltage",
+            "translation": "HV BEC Voltage",
+            "needs_translation": "false"
+          },
+          "gov": {
+            "english": "Governor",
+            "translation": "Governor",
+            "needs_translation": "false"
+          },
+          "brake_force": {
+            "english": "Brake Force",
+            "translation": "Brake Force",
+            "needs_translation": "false"
+          },
+          "sr_function": {
+            "english": "SR Function",
+            "translation": "SR Function",
+            "needs_translation": "false"
+          },
+          "name": {
+            "english": "OMPHOBBY",
+            "translation": "OMPHOBBY",
+            "needs_translation": "false"
+          },
+          "lv_bec_voltage": {
+            "english": "LV BEC Voltage",
+            "translation": "LV BEC Voltage",
+            "needs_translation": "false"
+          },
+          "auto_restart_time": {
+            "english": "Auto Restart Time",
+            "translation": "Auto Restart Time",
+            "needs_translation": "false"
+          },
+          "acceleration": {
+            "english": "Acceleration",
+            "translation": "Acceleration",
+            "needs_translation": "false"
+          },
+          "motor_direction": {
+            "english": "Motor Direction",
+            "translation": "Motor Direction",
+            "needs_translation": "false"
+          },
+          "smart_fan": {
+            "english": "Smart Fan",
+            "translation": "Smart Fan",
+            "needs_translation": "false"
+          },
+          "governor": {
+            "english": "Governor",
+            "translation": "Governor",
+            "needs_translation": "false"
+          },
+          "advanced": {
+            "english": "Advanced",
+            "translation": "Advanced",
+            "needs_translation": "false"
+          },
+          "gov_i": {
+            "english": "Gov-I",
+            "translation": "Gov-I",
+            "needs_translation": "false"
+          },
+          "cell_cutoff": {
+            "english": "Cell Cutoff",
+            "translation": "Cell Cutoff",
+            "needs_translation": "false"
+          },
+          "led_color": {
+            "english": "LED Color",
+            "translation": "LED Color",
+            "needs_translation": "false"
+          },
+          "basic": {
+            "english": "Basic",
+            "translation": "Basic",
+            "needs_translation": "false"
+          },
+          "startup_power": {
+            "english": "Startup Power",
+            "translation": "Startup Power",
+            "needs_translation": "false"
+          },
+          "motor_poles": {
+            "english": "Motor Poles",
+            "translation": "Motor Poles",
+            "needs_translation": "false"
+          },
+          "capacity_correction": {
+            "english": "Capacity Correction",
+            "translation": "Capacity Correction",
+            "needs_translation": "false"
+          },
+          "timing": {
+            "english": "Timing",
+            "translation": "Timing",
+            "needs_translation": "false"
+          },
+          "gov_p": {
+            "english": "Gov-P",
+            "translation": "Gov-P",
+            "needs_translation": "false"
+          }
+        },
         "flrtr": {
           "gov": {
             "english": "Governor",
@@ -830,9 +977,9 @@
             "translation": "Low voltage protection",
             "needs_translation": "false"
           },
-          "gov_d": {
-            "english": "Gov-D",
-            "translation": "Gov-D",
+          "drive_freq": {
+            "english": "Drive frequency",
+            "translation": "Drive frequency",
             "needs_translation": "false"
           },
           "telemetry_protocol": {
@@ -1933,6 +2080,11 @@
       }
     },
     "battery": {
+      "calcfuel_local": {
+        "english": "Calculate Fuel Using",
+        "translation": "Calculate Fuel Using",
+        "needs_translation": "false"
+      },
       "max_cell_voltage": {
         "english": "Max Cell Voltage",
         "translation": "Max Cell Voltage",
@@ -1981,6 +2133,26 @@
       "timer": {
         "english": "Flight Time Alarm",
         "translation": "Flight Time Alarm",
+        "needs_translation": "false"
+      },
+      "voltage_multiplier": {
+        "english": "Sag Compensation",
+        "translation": "Sag Compensation",
+        "needs_translation": "false"
+      },
+      "alert_type": {
+        "english": "Rx Voltage Alert",
+        "translation": "Rx Voltage Alert",
+        "needs_translation": "false"
+      },
+      "bec_voltage_alert": {
+        "english": "BEC Alert Value",
+        "translation": "BEC Alert Value",
+        "needs_translation": "false"
+      },
+      "rx_voltage_alert": {
+        "english": "RxBatt Alert Value",
+        "translation": "RxBatt Alert Value",
         "needs_translation": "false"
       }
     },
@@ -2699,6 +2871,16 @@
       "ethos_version": {
         "english": "Ethos Version",
         "translation": "Ethos Version",
+        "needs_translation": "false"
+      },
+      "rf_version": {
+        "english": "Rotorflight Version",
+        "translation": "Rotorflight Version",
+        "needs_translation": "false"
+      },
+      "fc_version": {
+        "english": "FC Version",
+        "translation": "FC Version",
         "needs_translation": "false"
       },
       "name": {

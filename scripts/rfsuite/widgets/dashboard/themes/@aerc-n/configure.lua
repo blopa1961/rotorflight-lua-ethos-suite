@@ -12,6 +12,7 @@
 ]]--
 
 local config = {}
+
 local THEME_DEFAULTS = {
     rpm_min      = 0,
     rpm_max      = 3000,
@@ -95,7 +96,6 @@ local function configure()
         end)
     formFields[#formFields]:decimals(1)
     formFields[#formFields]:suffix("V")
-
 end
 
 local function write()

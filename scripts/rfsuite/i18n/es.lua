@@ -111,7 +111,7 @@ return {
       ["current_gain"] = "Valor de ganancia para el sensor actual",
       ["tbl_extgov"] = "Governor Externo",
       ["buzzer_volume"] = "Volumen del Buzzer",
-      ["gov_d"] = "Valor de derivada para el governor",
+      ["drive_freq"] = "PWM drive frequency",
       ["tbl_enabled"] = "Habilitado",
       ["gov_p"] = "Valor proporcional para el governor"
     },
@@ -249,6 +249,15 @@ return {
     ["PILOT_CONFIG"] = {
       ["model_param1_value"] = "Establezca el tiempo esperado de vuelo en segundos. El transmisor emitirá beeps cuando el tiempo establecido se haya alcanzado."
     },
+    ["BATTERY_INI"] = {
+      ["calcfuel_local"] = "Calculate Fuel Using",
+      ["tbl_off"] = "Current Sensor",
+      ["tbl_on"] = "Voltage Sensor",
+      ["sag_multiplier"] = "Raise or lower to adjust for the amount of voltage sag you see in flight.",
+      ["alert_off"] = "Off",
+      ["alert_bec"] = "BEC",
+      ["alert_rxbatt"] = "Rx Batt"
+    },
     ["BATTERY_CONFIG"] = {
       ["vbatmincellvoltage"] = "El voltaje minimo por celda al cual se dispara la alarma de bajo voltaje.",
       ["vbatmaxcellvoltage"] = "El voltaje maximo por celda al cual se dispara la alarma de voltaje alto.",
@@ -354,6 +363,36 @@ return {
       ["tbl_fwgov"] = "Ala Fija",
       ["tbl_on"] = "Encendido"
     },
+    ["ESC_PARAMETERS_OMP"] = {
+      ["tbl_jadegreen"] = "VERDE JADE",
+      ["tbl_off"] = "Apagado",
+      ["tbl_low"] = "Bajo",
+      ["tbl_orange"] = "NARANJA",
+      ["tbl_fmfw"] = "Ala Fija",
+      ["tbl_ccw"] = "AntiH.",
+      ["tbl_medium"] = "Medio",
+      ["tbl_yellow"] = "AMARILLO",
+      ["tbl_reverse"] = "Reversa",
+      ["tbl_red"] = "ROJO",
+      ["tbl_high"] = "Alto",
+      ["tbl_auto"] = "Auto",
+      ["tbl_cw"] = "Horario",
+      ["tbl_fmheli"] = "Helicoptero",
+      ["tbl_purple"] = "PURPURA",
+      ["tbl_green"] = "VERDE",
+      ["tbl_blue"] = "AZUL",
+      ["tbl_slow"] = "Lento",
+      ["tbl_normal"] = "Normal",
+      ["tbl_fast"] = "Rapido",
+      ["tbl_escgov"] = "Governor ESC",
+      ["tbl_white"] = "BLANCO",
+      ["tbl_cyan"] = "CYAN",
+      ["tbl_vslow"] = "Muy Lento",
+      ["tbl_extgov"] = "Governor Externo",
+      ["tbl_pink"] = "ROSA",
+      ["tbl_fwgov"] = "Ala Fija",
+      ["tbl_on"] = "Encendido"
+    },
     ["ESC_PARAMETERS_SCORPION"] = {
       ["tbl_airplane"] = "Modo Avion",
       ["tbl_cw"] = "Horario",
@@ -394,11 +433,11 @@ return {
     ["navigation_help"] = "?",
     ["modules"] = {
       ["stats"] = {
-        ["name"] = "Stats",
-        ["totalflighttime"] = "Total Flight Time",
-        ["flightcount"] = "Flight Count",
-        ["lastflighttime"] = "Last Flight Time",
-        ["help_p1"] = "Use this module to update the recorded flight statistics on the flight controller."
+        ["name"] = "Estadísticas",
+        ["totalflighttime"] = "Tiempo Total de Vuelo",
+        ["flightcount"] = "Nro de Vuelos",
+        ["lastflighttime"] = "Tiempo Ultimo Vuelo",
+        ["help_p1"] = "Utilice este módulo para actualizar las estadísticas guardadas en el controlador de vuelo."
       },
       ["settings"] = {
         ["name"] = "Configuración",
@@ -425,7 +464,12 @@ return {
         ["txt_debug"] = "DEBUG",
         ["txt_mspdata"] = "Log datos msp",
         ["txt_queuesize"] = "Tamaño cola Log MSP",
+        ["txt_taskprofiler"] = "Log tasks speed",
         ["txt_memusage"] = "Uso de memoria Log",
+        ["txt_batttype"] = "Tx Battery Options",
+        ["txt_battdef"] = "Default",
+        ["txt_batttext"] = "Text",
+        ["txt_battdig"] = "Digital",
         ["dashboard"] = "Panel",
         ["dashboard_theme"] = "Tema",
         ["dashboard_theme_panel_global"] = "Tema por defecto Global",
@@ -472,7 +516,10 @@ return {
         ["timer_postalert_options"] = "Opciones Alerta Post-timer",
         ["timer_postalert"] = "Alerta Post-timer",
         ["timer_postalert_period"] = "Período Alerta",
-        ["timer_postalert_interval"] = "Intervalo Alerta"
+        ["timer_postalert_interval"] = "Intervalo Alerta",
+        ["adj_callouts"] = "Adjustment Callouts",
+        ["adj_function"] = "Adjustment Function",
+        ["adj_value"] = "Adjustment Value"
       },
       ["validate_sensors"] = {
         ["help_p1"] = "Esta herramienta intenta listar todos los sensores necesarios que faltan.",
@@ -544,6 +591,29 @@ return {
             ["timing"] = "Timing",
             ["gov_p"] = "Gov-P"
           },
+          ["omp"] = {
+            ["hv_bec_voltage"] = "Voltaje HV BEC",
+            ["gov"] = "Governor",
+            ["brake_force"] = "Fuerza de Frenado",
+            ["sr_function"] = "Función SR",
+            ["name"] = "OMPHOBBY",
+            ["lv_bec_voltage"] = "Voltaje LV BEC",
+            ["auto_restart_time"] = "Tiempo Auto Reinicio",
+            ["acceleration"] = "Aceleración",
+            ["motor_direction"] = "Dirección Motor",
+            ["smart_fan"] = "Ventilador Inteligente",
+            ["governor"] = "Governor",
+            ["advanced"] = "Avanzado",
+            ["gov_i"] = "Gov-I",
+            ["cell_cutoff"] = "Corte Celdas",
+            ["led_color"] = "Color LED",
+            ["basic"] = "Básico",
+            ["startup_power"] = "Potencia de Inicio",
+            ["motor_poles"] = "Polos del Motor",
+            ["capacity_correction"] = "Corrección Capacidad",
+            ["timing"] = "Timing",
+            ["gov_p"] = "Gov-P"
+          },
           ["flrtr"] = {
             ["gov"] = "Governor",
             ["motor_temp_sensor"] = "Sensor temp. motor",
@@ -553,7 +623,7 @@ return {
             ["motor_erpm_max"] = "Max ERPM Motor",
             ["name"] = "FLYROTOR",
             ["low_voltage_protection"] = "Proteccion bajo voltaje",
-            ["gov_d"] = "Gov-D",
+            ["drive_freq"] = "Drive frequency",
             ["telemetry_protocol"] = "Protocolo de telemetria",
             ["motor_direction"] = "Direccion del Motor",
             ["throttle_protocol"] = "Protocolo de acelerador",
@@ -796,6 +866,7 @@ return {
         ["help_logs_p3"] = "- estado de armado, voltaje, velocidad del rotor, corriente, temperatura del ESC"
       },
       ["battery"] = {
+        ["calcfuel_local"] = "Calculate fuel using",
         ["max_cell_voltage"] = "Voltaje Máx Celda",
         ["full_cell_voltage"] = "Voltaje de Celda llena",
         ["name"] = "Batería",
@@ -805,7 +876,11 @@ return {
         ["warn_cell_voltage"] = "Advertencia Voltaje de Celda",
         ["cell_count"] = "Número de Celdas",
         ["consumption_warning_percentage"] = "Advertencia Consumo %",
-        ["timer"] = "Alarma Tiempo Vuelo"
+        ["timer"] = "Alarma Tiempo Vuelo",
+        ["voltage_multiplier"] = "Compensación de caída",
+        ["alert_type"] = "BEC or Rx Batt Voltage Alert",
+        ["bec_voltage_alert"] = "BEC Alert Value",
+        ["rx_voltage_alert"] = "RX Batt Alert Value"
       },
       ["profile_mainrotor"] = {
         ["gain"] = "Ganancia",
@@ -964,6 +1039,8 @@ return {
         ["help_p1"] = "Esta página provee información que le puede ser requerida cuando solicite soporte técnico.",
         ["msgbox_credits"] = "Créditos",
         ["ethos_version"] = "Versión de Ethos",
+        ["rf_version"] = "Versión de Rotorflight",
+        ["fc_version"] = "Versión de FC",
         ["name"] = "Acerca de",
         ["supported_versions"] = "Ver. MSP Soportadas",
         ["license"] = "Puede copiar, distribuir, y modificar este software siempre y cuando se comprometa a marcar/fechar los cambios en el código fuente. Todas las modificaciones a nuestro software incluyendo código licenciado mediante GPL (via compilador) deben ser distribuidas bajo licencia GPL junto con instrucciones de compilación e instalación.",
@@ -1185,11 +1262,13 @@ return {
       ["fuel"] = "Nivel de Carga",
       ["smartfuel"] = "Smart Fuel",
       ["rssi"] = "RSSI",
+      ["link"] = "Calidad de Enlace",
       ["adj_val"] = "Ajus.(Valor)",
       ["arming_flags"] = "Banderas Armado",
       ["current"] = "Corriente",
       ["throttle_pct"] = "% Acelerador",
       ["consumption"] = "Consumo",
+      ["smartconsumption"] = "Consumo Inteligente",
       ["pid_profile"] = "Perfil PID",
       ["mcu_temp"] = "Temperatura MCU",
       ["armdisableflags"] = "Desactivar Armado"
@@ -1268,7 +1347,9 @@ return {
       ["power"] = "Potencia",
       ["cell_voltage"] = "Voltaje Celda",
       ["volts_per_cell"] = "Volts por celda",
-      ["warning"] = "Advertencia"
+      ["warning"] = "Advertencia",
+      ["tx_batt"] = "TX Battery",
+      ["link_max"] = "Link Max"
     },
     ["governor"] = {
       ["UNKNOWN"] = "DESCONOCIDO",

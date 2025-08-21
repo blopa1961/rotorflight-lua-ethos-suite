@@ -15,6 +15,13 @@ local function openPage(pidx, title, script)
     rfsuite.app.triggers.closeProgressLoader = true
     form.clear()
 
+    -- Clear old icons
+    for i in pairs(rfsuite.app.gfx_buttons) do
+        if i ~= "settings_dashboard_themes" then
+            rfsuite.app.gfx_buttons[i] = nil
+        end
+    end   
+
 
     rfsuite.app.lastIdx    = pageIdx
     rfsuite.app.lastTitle  = title
@@ -122,7 +129,7 @@ local function openPage(pidx, title, script)
     end
 
     if n == 0 then
-        local w, h = rfsuite.utils.getWindowSize()
+        local w, h = lcd.getWindowSize()
         local msg = i18n("app.modules.settings.no_themes_available_to_configure")
         local tw, th = lcd.getTextSize(msg)
         local x = w / 2 - tw / 2

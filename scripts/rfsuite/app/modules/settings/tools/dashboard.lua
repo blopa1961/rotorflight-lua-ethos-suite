@@ -8,6 +8,7 @@ local S_PAGES = {
 
 local enableWakeup = false
 local prevConnectedState = nil
+local initTime = os.clock()
 
 local function openPage(pidx, title, script)
 
@@ -24,6 +25,13 @@ local function openPage(pidx, title, script)
     rfsuite.app.lastTitle = title
     rfsuite.app.lastScript = script
 
+    -- Clear old icons
+    for i in pairs(rfsuite.app.gfx_buttons) do
+        if i ~= "settings_dashboard" then
+            rfsuite.app.gfx_buttons[i] = nil
+        end
+    end    
+
     ESC = {}
 
     -- size of buttons
@@ -33,7 +41,7 @@ local function openPage(pidx, title, script)
         rfsuite.preferences.general.iconsize = tonumber(rfsuite.preferences.general.iconsize)
     end
 
-    local w, h = rfsuite.utils.getWindowSize()
+    local w, h = lcd.getWindowSize()
     local windowWidth = w
     local windowHeight = h
     local padding = rfsuite.app.radio.buttonPadding
@@ -168,6 +176,12 @@ local function wakeup()
         return
     end
 
+    -- Exit if less than 0.25 second since init
+    -- This prevents the icon getting trashed due to being disabled before rendering
+    if os.clock() - initTime < 0.25 then
+        return
+    end
+
     -- current combined state: true only if both are truthy
     local currState = (rfsuite.session.isConnected and rfsuite.session.mcu_id) and true or false
 
@@ -175,6 +189,10 @@ local function wakeup()
     if currState ~= prevConnectedState then
         -- toggle all three fields together
         rfsuite.app.formFields[2]:enable(currState)
+
+        if not currState then
+            rfsuite.app.formNavigationFields['menu']:focus()
+        end
 
         -- remember for next time
         prevConnectedState = currState

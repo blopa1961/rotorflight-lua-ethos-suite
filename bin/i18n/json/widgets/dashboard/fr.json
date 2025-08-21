@@ -278,5 +278,15 @@
     "english": "Warning",
     "translation": "Avertissement",
     "needs_translation": "false"
+  },
+  "tx_batt": {
+    "english": "TX Battery",
+    "translation": "TX Battery",
+    "needs_translation": "true"
+  },
+  "link_max": {
+    "english": "Link Max",
+    "translation": "Link Max",
+    "needs_translation": "true"
   }
 }

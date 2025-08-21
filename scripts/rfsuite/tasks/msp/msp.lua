@@ -32,7 +32,7 @@ msp.onConnectChecksInit = true
 local protocol = assert(rfsuite.compiler.loadfile("tasks/msp/protocols.lua"))()
 
 
-msp.mspQueue = mspQueue
+msp.mspQueue = nil
 
 -- set active protocol to use
 msp.protocol = protocol.getProtocol()
@@ -50,6 +50,10 @@ msp.protocol.mspPoll = transport.mspPoll
 
 msp.mspQueue = assert(rfsuite.compiler.loadfile("tasks/msp/mspQueue.lua"))()
 msp.mspQueue.maxRetries = msp.protocol.maxRetries
+msp.mspQueue.loopInterval = 0.01   -- process every 10ms (throttles CPU)
+msp.mspQueue.copyOnAdd    = false  -- keep RAM/GC low (set true for strict immutability)
+msp.mspQueue.timeout      = 2.0    -- per-message timeout (override if you want)
+
 msp.mspHelper = assert(rfsuite.compiler.loadfile("tasks/msp/mspHelper.lua"))()
 msp.api = assert(rfsuite.compiler.loadfile("tasks/msp/api.lua"))()
 msp.common = assert(rfsuite.compiler.loadfile("tasks/msp/common.lua"))()
@@ -67,10 +71,13 @@ function msp.wakeup()
         msp.sensor:module(rfsuite.session.telemetrySensor:module())
     end
     
-    if not msp.sensorTlm then
-        msp.sensorTlm = sport.getSensor()
-        msp.sensorTlm:module(rfsuite.session.telemetrySensor:module())
+    if not msp.sensorTlm and rfsuite.session.telemetrySensor then
+        msp.sensorTlm = sport.getSensor({primId = 0x32})
+        local moduleId = rfsuite.session.telemetrySensor:module()
+        msp.sensorTlm:module(moduleId)
+        rfsuite.session.telemetryModule = model.getModule(moduleId)
     end
+
 
     if rfsuite.session.resetMSP and not delayPending then
         delayStartTime = os.clock()
@@ -145,7 +152,9 @@ function msp.reset()
     msp.sensor = nil
     msp.activeProtocol = nil
     msp.onConnectChecksInit = true
-    rfsuite.utils.session()
+    delayStartTime = nil
+    msp.sensorTlm = nil
+    delayPending = false    
 end
 
 return msp

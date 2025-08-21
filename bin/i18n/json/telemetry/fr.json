@@ -81,7 +81,7 @@
       "needs_translation": "false"
     },
     "fuel": {
-      "english": "Charge Level",
+      "english": "Fuel",
       "translation": "Niveau de Carburant",
       "needs_translation": "false"
     },
@@ -93,6 +93,11 @@
     "rssi": {
       "english": "RSSI",
       "translation": "Signal du Recepteur",
+      "needs_translation": "false"
+    },
+    "link": {
+      "english": "Link Quality",
+      "translation": "Qualité du Lien",
       "needs_translation": "false"
     },
     "adj_val": {
@@ -118,6 +123,11 @@
     "consumption": {
       "english": "Consumption",
       "translation": "Consommation",
+      "needs_translation": "false"
+    },
+    "smartconsumption": {
+      "english": "Smart Consumption",
+      "translation": "Consommation Intelligente",
       "needs_translation": "false"
     },
     "pid_profile": {

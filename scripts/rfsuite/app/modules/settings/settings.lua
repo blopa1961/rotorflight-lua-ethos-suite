@@ -23,6 +23,13 @@ local function openPage(pidx, title, script)
     rfsuite.app.lastTitle = title
     rfsuite.app.lastScript = script
 
+    -- Clear old icons
+    for i in pairs(rfsuite.app.gfx_buttons) do
+        if i ~= "settings" then
+            rfsuite.app.gfx_buttons[i] = nil
+        end
+    end
+
     ESC = {}
 
     -- size of buttons
@@ -32,7 +39,7 @@ local function openPage(pidx, title, script)
         rfsuite.preferences.general.iconsize = tonumber(rfsuite.preferences.general.iconsize)
     end
 
-    local w, h = rfsuite.utils.getWindowSize()
+    local w, h = lcd.getWindowSize()
     local windowWidth = w
     local windowHeight = h
     local padding = rfsuite.app.radio.buttonPadding

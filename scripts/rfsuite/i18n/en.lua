@@ -111,7 +111,7 @@ return {
       ["current_gain"] = "Gain value for the current sensor",
       ["tbl_extgov"] = "External Governor",
       ["buzzer_volume"] = "Buzzer volume",
-      ["gov_d"] = "Derivative value for the governor",
+      ["drive_freq"] = "PWM drive frequency",
       ["tbl_enabled"] = "Enabled",
       ["gov_p"] = "Proportional value for the governor"
     },
@@ -249,6 +249,15 @@ return {
     ["PILOT_CONFIG"] = {
       ["model_param1_value"] = "Set this to the expected flight time in seconds.  The transmitter will beep when the flight time is reached."
     },
+    ["BATTERY_INI"] = {
+      ["calcfuel_local"] = "Calculate Fuel Using",
+      ["tbl_off"] = "Current Sensor",
+      ["tbl_on"] = "Voltage Sensor",
+      ["sag_multiplier"] = "Raise or lower to adjust for the amount of voltage sag you see in flight.",
+      ["alert_off"] = "Off",
+      ["alert_bec"] = "BEC",
+      ["alert_rxbatt"] = "RxBatt"
+    },
     ["BATTERY_CONFIG"] = {
       ["vbatmincellvoltage"] = "The minimum voltage per cell before the low voltage alarm is triggered.",
       ["vbatmaxcellvoltage"] = "The maximum voltage per cell before the high voltage alarm is triggered.",
@@ -354,6 +363,36 @@ return {
       ["tbl_fwgov"] = "Fixed Wing",
       ["tbl_on"] = "On"
     },
+    ["ESC_PARAMETERS_OMP"] = {
+      ["tbl_jadegreen"] = "JADE GREEN",
+      ["tbl_off"] = "Off",
+      ["tbl_low"] = "Low",
+      ["tbl_orange"] = "ORANGE",
+      ["tbl_fmfw"] = "Fixed Wing",
+      ["tbl_ccw"] = "CCW",
+      ["tbl_medium"] = "Medium",
+      ["tbl_yellow"] = "YELLOW",
+      ["tbl_reverse"] = "Reverse",
+      ["tbl_red"] = "Red",
+      ["tbl_high"] = "High",
+      ["tbl_auto"] = "Auto",
+      ["tbl_cw"] = "CW",
+      ["tbl_fmheli"] = "Helicopter",
+      ["tbl_purple"] = "PURPLE",
+      ["tbl_green"] = "GREEN",
+      ["tbl_blue"] = "BLUE",
+      ["tbl_slow"] = "Slow",
+      ["tbl_normal"] = "Normal",
+      ["tbl_fast"] = "Fast",
+      ["tbl_escgov"] = "ESC Governor",
+      ["tbl_white"] = "WHITE",
+      ["tbl_cyan"] = "CYAN",
+      ["tbl_vslow"] = "Very Slow",
+      ["tbl_extgov"] = "External Governor",
+      ["tbl_pink"] = "PINK",
+      ["tbl_fwgov"] = "Fixed Wing",
+      ["tbl_on"] = "On"
+    },
     ["ESC_PARAMETERS_SCORPION"] = {
       ["tbl_airplane"] = "Airplane mode",
       ["tbl_cw"] = "CW",
@@ -425,7 +464,12 @@ return {
         ["txt_debug"] = "DEBUG",
         ["txt_mspdata"] = "Log msp data",
         ["txt_queuesize"] = "Log MSP queue size",
+        ["txt_taskprofiler"] = "Log tasks speed",
         ["txt_memusage"] = "Log memory usage",
+        ["txt_batttype"] = "Tx Battery Options",
+        ["txt_battdef"] = "Default",
+        ["txt_batttext"] = "Text",
+        ["txt_battdig"] = "Digital",
         ["dashboard"] = "Dashboard",
         ["dashboard_theme"] = "Theme",
         ["dashboard_theme_panel_global"] = "Default theme for all models",
@@ -472,7 +516,10 @@ return {
         ["timer_postalert_options"] = "Post-timer Alert Options",
         ["timer_postalert"] = "Post-timer Alert",
         ["timer_postalert_period"] = "Alert Period",
-        ["timer_postalert_interval"] = "Alert Interval"
+        ["timer_postalert_interval"] = "Alert Interval",
+        ["adj_callouts"] = "Adjustment Callouts",
+        ["adj_function"] = "Adjustment Function",
+        ["adj_value"] = "Adjustment Value"
       },
       ["validate_sensors"] = {
         ["help_p1"] = "This tool attempts to list all the sensors that you are not receiving in a concise list.",
@@ -544,6 +591,29 @@ return {
             ["timing"] = "Timing",
             ["gov_p"] = "Gov-P"
           },
+          ["omp"] = {
+            ["hv_bec_voltage"] = "HV BEC Voltage",
+            ["gov"] = "Governor",
+            ["brake_force"] = "Brake Force",
+            ["sr_function"] = "SR Function",
+            ["name"] = "OMPHOBBY",
+            ["lv_bec_voltage"] = "LV BEC Voltage",
+            ["auto_restart_time"] = "Auto Restart Time",
+            ["acceleration"] = "Acceleration",
+            ["motor_direction"] = "Motor Direction",
+            ["smart_fan"] = "Smart Fan",
+            ["governor"] = "Governor",
+            ["advanced"] = "Advanced",
+            ["gov_i"] = "Gov-I",
+            ["cell_cutoff"] = "Cell Cutoff",
+            ["led_color"] = "LED Color",
+            ["basic"] = "Basic",
+            ["startup_power"] = "Startup Power",
+            ["motor_poles"] = "Motor Poles",
+            ["capacity_correction"] = "Capacity Correction",
+            ["timing"] = "Timing",
+            ["gov_p"] = "Gov-P"
+          },
           ["flrtr"] = {
             ["gov"] = "Governor",
             ["motor_temp_sensor"] = "Motor temp sensor",
@@ -553,7 +623,7 @@ return {
             ["motor_erpm_max"] = "Motor ERPM max",
             ["name"] = "FLYROTOR",
             ["low_voltage_protection"] = "Low voltage protection",
-            ["gov_d"] = "Gov-D",
+            ["drive_freq"] = "Drive frequency",
             ["telemetry_protocol"] = "Telemetry protocol",
             ["motor_direction"] = "Motor direction",
             ["throttle_protocol"] = "Throttle protocol",
@@ -796,6 +866,7 @@ return {
         ["help_logs_p3"] = "- arm status, voltage, headspeed, current, esc temperature"
       },
       ["battery"] = {
+        ["calcfuel_local"] = "Calculate Fuel Using",
         ["max_cell_voltage"] = "Max Cell Voltage",
         ["full_cell_voltage"] = "Full Cell Voltage",
         ["name"] = "Battery",
@@ -805,7 +876,11 @@ return {
         ["warn_cell_voltage"] = "Warn Cell Voltage",
         ["cell_count"] = "Cell Count",
         ["consumption_warning_percentage"] = "Consumption Warning %",
-        ["timer"] = "Flight Time Alarm"
+        ["timer"] = "Flight Time Alarm",
+        ["voltage_multiplier"] = "Sag Compensation",
+        ["alert_type"] = "Rx Voltage Alert",
+        ["bec_voltage_alert"] = "BEC Alert Value",
+        ["rx_voltage_alert"] = "RxBatt Alert Value"
       },
       ["profile_mainrotor"] = {
         ["gain"] = "Gain",
@@ -964,6 +1039,8 @@ return {
         ["help_p1"] = "This page provides some useful information that you may be asked for when requesting support.",
         ["msgbox_credits"] = "Credits",
         ["ethos_version"] = "Ethos Version",
+        ["rf_version"] = "Rotorflight Version",
+        ["fc_version"] = "FC Version",
         ["name"] = "About",
         ["supported_versions"] = "Supported MSP Versions",
         ["license"] = "You may copy, distribute, and modify the software as long as you track changes/dates in source files. Any modifications to or software including (via compiler) GPL-licensed code must also be made available under the GPL along with build & install instructions.",
@@ -1185,11 +1262,13 @@ return {
       ["fuel"] = "Fuel",
       ["smartfuel"] = "Smart Fuel",
       ["rssi"] = "RSSI",
+      ["link"] = "Link Quality",
       ["adj_val"] = "Adj (Value)",
       ["arming_flags"] = "Arming Flags",
       ["current"] = "Current",
       ["throttle_pct"] = "Throttle %",
-      ["consumption"] = "Fuel",
+      ["consumption"] = "Consumption",
+      ["smartconsumption"] = "Smart Consumption",
       ["pid_profile"] = "PID Profile",
       ["mcu_temp"] = "MCU Temperature",
       ["armdisableflags"] = "Arming Disable"
@@ -1268,7 +1347,9 @@ return {
       ["power"] = "Power",
       ["cell_voltage"] = "Cell Voltage",
       ["volts_per_cell"] = "Volts per cell",
-      ["warning"] = "Warning"
+      ["warning"] = "Warning",
+      ["tx_batt"] = "TX Battery",
+      ["link_max"] = "Link Max"
     },
     ["governor"] = {
       ["UNKNOWN"] = "UNKNOWN",

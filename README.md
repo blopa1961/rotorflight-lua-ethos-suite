@@ -177,27 +177,29 @@ To build and deploy RFSuite locally:
     pip install tqdm
     pip install serial
     ```
-    
 
-### Environment Variables
+If you do not have npm command, you will need to install NodeJS   
 
-Configure the following system variables:
+### Config file
 
-```bash
-FRSKY_SIM_BIN = C:\Program Files (x86)\FrSky\Ethos\X18S\simulator.exe
-FRSKY_SIM_SRC = C:\Program Files (x86)\FrSky\Ethos\X18S\scripts
-FRSKY_ETHOS_SUITE_BIN = C:\Program Files\Ethos Suite\Ethos Suite.exe
-```
+Copy the file bin/config-example.json to a folder outside of github and name to suite your preference.
 
-You may use a comma-separated list in `FRSKY_SIM_SRC` to deploy to multiple simulators simultaneously.
+Setup en env var of RFSUITE_CONFIG=C:\GitHub\rotorflight-lua-ethos-suite.json  (the path to the file)
+
+Suggested:
+Repo:  C:\GitHub\rotorflight-lua-ethos-suite\<files>
+Config: C:\GitHub\rotorflight-lua-ethos-suite.json
+
 
 ### VS Code Tasks
 
--   **SIM: Deploy** – Pushes scripts to the simulator
+-   **Deploy & Launch** – Pushes scripts to the default simulator
+
+-   **Deploy & Choose** – Pushes scripts to the selected simulator 
     
--   **SIM: Deploy & Launch** – Deploys and starts simulator with debug output
-    
--   **Remote: Deploy** – Installs scripts to a connected transmitter via USB
+-   **Deploy Radio** – Pushes scripts to the radio
+
+-   **Deploy Radio and  Debug** – Pushes scripts to the radio and starts serial console
     
 
 ----------
