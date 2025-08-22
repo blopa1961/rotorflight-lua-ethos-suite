@@ -106,7 +106,7 @@ local function getOrCreateSensor(uid, name, unit, dec, value, min, max)
     if not sensors.uid[uid] then
         sensors.uid[uid] = system.getSource({ category = CATEGORY_TELEMETRY_SENSOR, appId = uid })
         if not sensors.uid[uid] then
-            rfsuite.utils.log("Create sensor: " .. uid, "debug")
+            --rfsuite.utils.log("Create sensor: " .. uid, "debug")
             createTelemetrySensor(uid, name, unit, dec, value, min, max)
         end
     end
@@ -373,8 +373,6 @@ end
 ---------------------------------------------------------------------
 function elrs.crossfirePop()
     if (CRSF_PAUSE_TELEMETRY == true or rfsuite.app.triggers.mspBusy == true or not telemetryActive()) then
-        local module = rfsuite.session.telemetryModule
-        if module ~= nil and module.muteSensorLost ~= nil then module:muteSensorLost(5.0) end
         if not telemetryActive() then resetSensors() end
         return false
     end
@@ -439,7 +437,7 @@ function elrs.wakeup()
         local frameCount = 0
         while elrs.crossfirePop() do
             frameCount = frameCount + 1
-            if frameCount >= 100 then break end
+            if frameCount >= 50 then break end
             if CRSF_PAUSE_TELEMETRY == true or rfsuite.app.triggers.mspBusy == true then break end
         end
         refreshStaleSensors()
